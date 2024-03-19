@@ -43,10 +43,11 @@ const Deposit: React.FC<DepositProps> = ({
   });
 
   const emptyVaultMap = vaultData?.map((data) => !data) || [];
-  const hasEmptyVaults = emptyVaultMap?.includes(true);
   const emptyVaults = emptyVaultMap
     .map((emptyVault, i) => (!emptyVault ? null : supportedVaults[i]))
     .filter((data) => !!data);
+
+  const availableVaults = 5 - emptyVaultMap.filter((data) => !data).length;
 
   return (
     <div className="w-full">
@@ -68,12 +69,14 @@ const Deposit: React.FC<DepositProps> = ({
         {supportedVaults.map((address, i) => (
           <Vault key={i} tokenId={tokenId} vaultAddress={address} />
         ))}
-        {hasEmptyVaults && (
-          <AddVault
-            tokenId={tokenId}
-            vaultAddresses={emptyVaults as Address[]}
-          />
-        )}
+        {availableVaults &&
+          Array.apply(null, Array(availableVaults)).map((_, i) => (
+            <AddVault
+              key={i}
+              tokenId={tokenId}
+              vaultAddresses={emptyVaults as Address[]}
+            />
+          ))}
       </div>
     </div>
   );
