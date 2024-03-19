@@ -3,7 +3,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 
-import { headers } from "next/headers";
 import { cn } from "@/lib/utils";
 import { Footer } from "@/components/ui/footer";
 import { MainNav } from "@/components/ui/main-nav";

@@ -10,44 +10,46 @@ import PieChartComponent from "@/components/reusable/PieChartComponent";
 
 interface NoteNumberProps {
   data: NoteNumberDataColumnModel[];
+  dyad: number[];
+  collateral: string;
 }
 
-const NoteNumber: React.FC<NoteNumberProps> = ({ data }) => {
+const NoteNumber: React.FC<NoteNumberProps> = ({ data, dyad, collateral }) => {
   const pieData = {
     width: "50",
     datasets: [
       {
         rotation: -50,
-        data: [12, 19],
+        data: dyad,
         labels: ["DYAD mintable", "DYAD minted"],
         backgroundColor: ["#45E845", "#DEDEDE"],
         borderWidth: 0,
         cutout: 85,
       },
       {
-        labels: ["% collateral 1", "% collateral 2", "% collateral 3"],
-        data: [12, 19, 3],
+        labels: ["WETH"],
+        data: [collateral],
         backgroundColor: ["#8D8D8D", "#676767", "#EDEDED"],
         borderWidth: 0,
         radius: "155%",
       },
     ],
   };
-  
+
   return (
     <div className="flex justify-between">
       <div className="flex justify-between w-full text-[#FAFAFA] px-3.5">
         <div className="w-[295px] justify-center mt-[20px]">
           <div className="w-[185px] m-auto">
             <PieChartComponent
-              data={PIE_CHART_MOCK_DATA}
+              data={pieData}
               options={{
                 plugins: {
                   tooltip: {
                     callbacks: {
                       label: (context: any) => {
                         const { dataIndex, dataset } = context;
-                        return `  ${dataset.labels[dataIndex]}:  ${dataset.data[dataIndex]}`;
+                        return `  ${dataset.labels[dataIndex]}:  ${typeof dataset.data[dataIndex] === "string" ? "$" : ""}${dataset.data[dataIndex]}`;
                       },
                     },
                   },

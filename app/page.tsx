@@ -19,7 +19,7 @@ export default function Home() {
   const [selectedValue, setSelectedValue] = useState("");
   const { address } = useAccount();
   const { data: notes } = useQuery({
-    queryKey: ["notes"],
+    queryKey: ["notes", address],
     queryFn: () =>
       alchemySdk.nft
         .getNftsForOwner(address as string, {

@@ -9,6 +9,7 @@ import {
   useReadVaultGetUsdValue,
   useReadVaultManagerCollatRatio,
   useReadVaultManagerHasVault,
+  useReadVaultManagerMinCollaterizationRatio,
   useReadWethAllowance,
   vaultAddress,
   vaultManagerAbi,
@@ -58,9 +59,17 @@ function NoteCard({ tokenId }: { tokenId: string }) {
     chainId: defaultChain.id,
   });
 
+  const { data: minCollateralizationRatio } =
+    useReadVaultManagerMinCollaterizationRatio({ chainId: defaultChain.id });
+
   const totalCollateral = `$${formatNumber(fromBigNumber(collateralValue))}`;
-  const collateralizationRatio = collatRatio === maxUint256 ? 'Infinity' : `${formatNumber(fromBigNumber(collatRatio, 16))}%`;
+  const collateralizationRatio =
+    collatRatio === maxUint256
+      ? "Infinity"
+      : `${formatNumber(fromBigNumber(collatRatio, 16))}%`;
   const totalDyad = `${fromBigNumber(mintedDyad)}`;
+
+  const maxDyad = (collateralValue || 0n) / (minCollateralizationRatio || 1n);
 
   const noteData: NoteNumberDataColumnModel[] = [
     {
@@ -85,7 +94,14 @@ function NoteCard({ tokenId }: { tokenId: string }) {
       label: `Note Nº ${tokenId}`,
       tabKey: `Note Nº ${tokenId}`,
       content: hasVault ? (
-        <NoteNumber data={noteData} />
+        <NoteNumber
+          data={noteData}
+          dyad={[
+            parseFloat(maxDyad.toString()) - fromBigNumber(mintedDyad),
+            fromBigNumber(mintedDyad),
+          ]}
+          collateral={formatNumber(fromBigNumber(collateralValue))}
+        />
       ) : (
         <p>Deposit collateral to open vault</p>
       ),
