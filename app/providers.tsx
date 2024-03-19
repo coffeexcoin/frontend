@@ -33,15 +33,13 @@ const client = new Client({
 
 export const Providers = ({
   children,
-  initialState,
 }: {
   children: ReactNode;
-  initialState: State | undefined;
 }) => {
   return (
     <NextUIProvider>
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-        <WagmiProvider config={wagmiConfig} initialState={initialState}>
+        <WagmiProvider config={wagmiConfig}>
           <QueryClientProvider client={queryClient}>
             <UrqlProvider value={client}>
               <ModalProvider>{children}</ModalProvider>

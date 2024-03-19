@@ -1,3 +1,5 @@
+'use client'
+
 import "./globals.css";
 import { Inter } from "next/font/google";
 
@@ -6,8 +8,6 @@ import { cn } from "@/lib/utils";
 import { Footer } from "@/components/ui/footer";
 import { MainNav } from "@/components/ui/main-nav";
 import MobileNotSupported from "@/components/ui/MobileNotSupported";
-import { cookieToInitialState } from "wagmi";
-import { wagmiConfig } from "@/lib/config";
 import { Providers } from "./providers";
 import { TransactionModal } from "@/components/reusable/TransactionModal";
 
@@ -18,10 +18,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const initialState = cookieToInitialState(
-    wagmiConfig,
-    headers().get("cookie")
-  );
   return (
     <html lang="en">
       <body
@@ -30,7 +26,7 @@ export default function RootLayout({
           inter.className
         )}
       >
-        <Providers initialState={initialState}>
+        <Providers>
           <main className="flex flex-col min-h-screen items-center desktop-view">
             <div className="flex max-w-screen-md w-[745px] h-16 justify-start box-border">
               <MainNav className="mx-4 flex-1 max-w-screen-md" />
