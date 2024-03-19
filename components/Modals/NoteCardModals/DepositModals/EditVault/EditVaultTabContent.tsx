@@ -85,6 +85,10 @@ const EditVaultTabContent: React.FC<EditVaultTabContentProps> = ({
         ).toString()
       );
     }
+
+    if (action === "redeem") {
+      setInputValue((mintedDyad || 0n).toString());
+    }
   };
 
   return (
@@ -94,7 +98,7 @@ const EditVaultTabContent: React.FC<EditVaultTabContentProps> = ({
           <BigIntInput
             value={inputValue}
             onChange={(value) => setInputValue(value)}
-            placeholder={`Amount of ${symbol} to ${action}...`}
+            placeholder={`Amount of ${action === "redeem" ? "DYAD" : symbol} to ${action}...`}
           />
         </div>
         <div className="w-[74px]">
@@ -103,7 +107,7 @@ const EditVaultTabContent: React.FC<EditVaultTabContentProps> = ({
           </ButtonComponent>
         </div>
       </div>
-      {mintedDyad !== 0n && !!mintedDyad && (
+      {mintedDyad !== 0n && !!mintedDyad && action !== "redeem" && (
         <div className="flex flex-col w-full justify-between font-semibold text-sm">
           <div className="flex text-[#A1A1AA]">
             <div className="mr-[5px]">Current collateralization ratio:</div>
@@ -124,15 +128,13 @@ const EditVaultTabContent: React.FC<EditVaultTabContentProps> = ({
                 config: {
                   address: vaultManagerAddress[defaultChain.id],
                   abi: vaultManagerAbi,
-                  functionName: action,
+                  functionName: action === "redeem" ? "redeemDyad" : action,
                   args:
                     action === "deposit"
                       ? [tokenId, vaultAddress, inputValue]
-                      : action === "withdraw"
-                        ? [tokenId, vaultAddress, inputValue, address]
-                        : [tokenId, vaultAddress, inputValue],
+                      : [tokenId, vaultAddress, inputValue, address],
                 },
-                description: `${action} ${formatNumber(fromBigNumber(inputValue), 4)} ${symbol}`,
+                description: `${action} ${formatNumber(fromBigNumber(inputValue), 4)} ${action === "redeem" ? "DYAD" : symbol}`,
               });
             }}
             disabled={!inputValue}
