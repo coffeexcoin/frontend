@@ -38,6 +38,19 @@ function AddVaultModal({
     (vault) => vaultInfo.filter((info) => info.vaultAddress === vault)[0].symbol
   );
 
+  if (vaults.length === 0) {
+    return (
+      <div className="flex flex-col gap-3">
+        <div>You have added all available collateral types to your Note</div>
+        <div className="w-[100px]">
+          <ButtonComponent>
+            <DialogClose>Close</DialogClose>
+          </ButtonComponent>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2">
       <div className="text-2xl font-semibold">
