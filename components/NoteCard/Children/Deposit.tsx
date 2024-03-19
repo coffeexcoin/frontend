@@ -187,7 +187,7 @@ const AddVault = ({
   return (
     <Dialog>
       <DialogTrigger>
-        <div className="font-semibold text-[#FAFAFA] text-sm items-center justify-center flex flex-col gap-2 w-[100px] h-[100px] bg-[#282828]">
+        <div className="font-semibold text-[#FAFAFA] text-sm items-center justify-center flex flex-col gap-2 w-[100px] h-[100px] bg-transparent border border-white/30">
           <p>+</p>
         </div>
       </DialogTrigger>
