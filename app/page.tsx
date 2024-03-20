@@ -14,6 +14,7 @@ import { alchemySdk } from "@/lib/alchemy";
 import { useAccount } from "wagmi";
 import { dNftAddress } from "@/generated";
 import { defaultChain } from "@/lib/config";
+import { SnapshotClaim } from "@/components/NoteCard/Children/SnapshotClaim";
 
 export default function Home() {
   const [selectedValue, setSelectedValue] = useState("");
@@ -89,6 +90,11 @@ export default function Home() {
       label: "Earn Kerosene",
       tabKey: "Earn Kerosene",
       content: keroseneData,
+    },
+    {
+      label: "Check Eligibility",
+      tabKey: "Check Eligibility",
+      content: <SnapshotClaim />,
     },
   ];
 
