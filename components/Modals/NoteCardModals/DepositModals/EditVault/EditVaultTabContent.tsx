@@ -76,14 +76,13 @@ const EditVaultTabContent: React.FC<EditVaultTabContentProps> = ({
       setInputValue(balance?.toString() || "0");
     }
     if (action === "withdraw") {
-      setInputValue(
-        toBigNumber(
-          (fromBigNumber(collateralValue) -
-            fromBigNumber(mintedDyad) *
-              fromBigNumber(minCollateralizationRatio)) /
-            fromBigNumber(assetValue, 8)
-        ).toString()
+      const theoreticalMax = toBigNumber(
+        (fromBigNumber(collateralValue) -
+          fromBigNumber(mintedDyad) *
+            fromBigNumber(minCollateralizationRatio)) /
+          fromBigNumber(assetValue, 8)
       );
+      setInputValue((theoreticalMax - toBigNumber(0.000001)).toString());
     }
 
     if (action === "redeem") {
@@ -136,6 +135,7 @@ const EditVaultTabContent: React.FC<EditVaultTabContentProps> = ({
                 },
                 description: `${action} ${formatNumber(fromBigNumber(inputValue), 4)} ${action === "redeem" ? "DYAD" : symbol}`,
               });
+              setInputValue("");
             }}
             disabled={!inputValue}
             variant="solid"

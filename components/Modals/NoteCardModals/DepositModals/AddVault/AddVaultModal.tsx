@@ -43,9 +43,9 @@ function AddVaultModal({
       <div className="flex flex-col gap-3">
         <div>You have added all available collateral types to your Note</div>
         <div className="w-[100px]">
-          <ButtonComponent>
-            <DialogClose>Close</DialogClose>
-          </ButtonComponent>
+          <DialogClose>
+            <ButtonComponent>Close</ButtonComponent>
+          </DialogClose>
         </div>
       </div>
     );

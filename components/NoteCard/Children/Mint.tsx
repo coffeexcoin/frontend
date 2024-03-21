@@ -90,7 +90,7 @@ const Mint: React.FC<MintProps> = ({ dyadMinted, currentCr, tokenId }) => {
         </div>
         <div className="w-[128px]">
           <ButtonComponent
-            onClick={() =>
+            onClick={() => {
               setTransactionData({
                 config: {
                   address: vaultManagerAddress[defaultChain.id],
@@ -99,8 +99,9 @@ const Mint: React.FC<MintProps> = ({ dyadMinted, currentCr, tokenId }) => {
                   args: [tokenId, mintInputValue, address],
                 },
                 description: `Mint ${fromBigNumber(mintInputValue)} DYAD increasing collateralization ratio to ~${newCr.toString()}%`,
-              })
-            }
+              });
+              setMintInputValue("");
+            }}
             disabled={!mintInputValue}
           >
             Mint
@@ -122,7 +123,7 @@ const Mint: React.FC<MintProps> = ({ dyadMinted, currentCr, tokenId }) => {
         </div>
         <div className="w-[128px]">
           <ButtonComponent
-            onClick={() =>
+            onClick={() => {
               setTransactionData({
                 config: {
                   address: vaultManagerAddress[defaultChain.id],
@@ -131,8 +132,9 @@ const Mint: React.FC<MintProps> = ({ dyadMinted, currentCr, tokenId }) => {
                   args: [tokenId, burnInputValue],
                 },
                 description: `Burn ${fromBigNumber(burnInputValue)} DYAD to reduce collateralization ratio to ~${newCr.toString()}%`,
-              })
-            }
+              });
+              setBurnInputValue("");
+            }}
             disabled={!burnInputValue}
           >
             Burn
