@@ -107,7 +107,7 @@ function NoteCard({ tokenId }: { tokenId: string }) {
       ),
     },
     {
-      label: "Deposit and Withdraw",
+      label: "Deposit & Withdraw",
       tabKey: "Deposit and Withdraw",
       content:
         allowance && allowance > 0n ? (
@@ -135,7 +135,7 @@ function NoteCard({ tokenId }: { tokenId: string }) {
         ),
     },
     {
-      label: "Mint DYAD",
+      label: "Mint & Burn",
       tabKey: "Mint DYAD",
       content: (
         <Mint

@@ -13,7 +13,7 @@ import { defaultChain } from "@/lib/config";
 import { useTransactionStore } from "@/lib/store";
 
 export function ClaimModalContent() {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { setTransactionData } = useTransactionStore();
 
   const { data: startingPrice } = useReadDNftStartPrice({
@@ -35,22 +35,26 @@ export function ClaimModalContent() {
 
   const nextNote = parseInt(totalSupply?.toString() || "0", 10);
 
-  return (
-    <Button
-      onClick={() => {
-        setTransactionData({
-          config: {
-            address: dNftAddress[defaultChain.id],
-            abi: dNftAbi,
-            functionName: "mintNft",
-            args: [address],
-            value: parseEther(mintPrice),
-          },
-          description: `Mint Note Nº ${nextNote} for ${mintPrice} ETH`,
-        });
-      }}
-    >
-      Mint Note Nº {nextNote} for {mintPrice} ETH
-    </Button>
-  );
+  if (isConnected) {
+    return (
+      <Button
+        onClick={() => {
+          setTransactionData({
+            config: {
+              address: dNftAddress[defaultChain.id],
+              abi: dNftAbi,
+              functionName: "mintNft",
+              args: [address],
+              value: parseEther(mintPrice),
+            },
+            description: `Mint Note Nº ${nextNote} for ${mintPrice} ETH`,
+          });
+        }}
+      >
+        Mint Note Nº {nextNote} for {mintPrice} ETH
+      </Button>
+    );
+  }
+
+  return <p>Connect wallet to view notes</p>
 }

@@ -47,13 +47,13 @@ export default function Home() {
     <>
       <div className="mt-12 mb-6 flex justify-between">
         <ClaimModalContent />
-        <div>
+        {/* <div>
           <SortbyComponent
             sortOptions={SORT_BY_OPTIONS}
             selected={selectedValue}
             onValueChange={setSelectedValue}
           />
-        </div>
+        </div> */}
       </div>
       <div className="flex flex-col gap-4">
         {notes &&
