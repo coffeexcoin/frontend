@@ -1,8 +1,5 @@
 import { useAccount, useContractWrite, useWaitForTransaction } from "wagmi";
 import { useCallback } from "react";
-import { Abi } from "viem";
-
-import { Vault } from "@/gql";
 import VaultManagerAbi from "@/abis/VaultManager.json";
 import Loader from "@/components/loader";
 import { CardContent, CardTitle } from "@/components/ui/card";
@@ -13,15 +10,10 @@ import useModal from "@/contexts/modal";
 interface Props {
   dnft: string;
   vault: string;
-  vaultManagerAddress: string;
+  vaultManager: string;
 }
 
-export function AddVaultModalContent({
-  dnft,
-  vault,
-  vaultAddress,
-  vaultManagerAddress,
-}: Props) {
+export function AddVaultModalContent({ dnft, vault, vaultManager }: Props) {
   const { shiftModal } = useModal();
   const { address } = useAccount();
 
@@ -33,10 +25,10 @@ export function AddVaultModalContent({
     write,
     reset,
   } = useContractWrite({
-    address: vaultManagerAddress,
+    address: vaultManager,
     abi: VaultManagerAbi["abi"],
     functionName: "add",
-    args: [dnft, vaultAddress],
+    args: [dnft, vault],
   });
 
   const { isLoading: isTxLoading, isError: isTxError } = useWaitForTransaction({
@@ -49,10 +41,10 @@ export function AddVaultModalContent({
       close();
     } else {
       write({
-        args: [dnft, vaultAddress],
+        args: [dnft, vault?.address],
       });
     }
-  }, [vaultManagerAddress, vault, write, dnft]);
+  }, [vaultManager, write, dnft]);
 
   const close = useCallback(() => {
     reset();
@@ -66,14 +58,14 @@ export function AddVaultModalContent({
           ? "Error"
           : isSuccess && !isTxLoading
           ? "Success!"
-          : "Enable wETH Deposit"}
+          : `Enable ${vault?.symbol} Deposit`}
       </CardTitle>
       <CardContent className="px-0 py-2 test-sm">
         {isError
           ? "Error sending transaction, please try again"
           : isSuccess && !isTxLoading
-          ? "wETH depositing enabled successfully!"
-          : "You must enable wETH for your Note before you can deposit."}
+          ? `${vault?.symbol} depositing enabled successfully!`
+          : `You must enable ${vault?.symbol} for your Note before you can deposit.`}
       </CardContent>
       {address ? (
         <Button className="mt-2 w-full" onClick={addVault}>
@@ -84,7 +76,7 @@ export function AddVaultModalContent({
           ) : isLoading || isTxLoading ? (
             <Loader />
           ) : (
-            "Enable wETH"
+            `Enable ${vault?.symbol}`
           )}
         </Button>
       ) : (

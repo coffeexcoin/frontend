@@ -7,7 +7,6 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { Abi, formatEther, parseEther } from "viem";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import VaultManagerAbi from "@/abis/VaultManager.json";
@@ -15,6 +14,9 @@ import PaymentsAbi from "@/abis/Payments.json";
 import ERC20 from "@/abis/ERC20.json";
 import Loader from "./loader";
 import { crColor } from "@/lib/utils";
+import useCR from "../hooks/useCR";
+import CR from "./cr";
+import Info from "./info.tsx";
 
 interface Props {
   setSelectedVaultId: (value: string) => void;
@@ -40,9 +42,7 @@ interface Props {
 
 export default function MintAndDepositTab({
   collatRatio,
-  setSelectedVaultId,
   selectedVault,
-  vaults,
   vault,
   payments,
   weth,
@@ -51,11 +51,15 @@ export default function MintAndDepositTab({
   dyadMinted,
   minCollateralizationRatio,
   vaultManager,
+  usdValue,
 }: Props) {
   const { address } = useAccount();
   const [depositInput, setDepositInput] = useState<string>();
   const [mintInput, setMintInput] = useState<string>();
   const [redeemInput, setRedeemInput] = useState<string>();
+
+  const { cr: crAfterDeposit } = useCR(usdValue, dyadMinted, depositInput, 0);
+  const { cr: crAfterMint } = useCR(usdValue, dyadMinted, 0, mintInput);
 
   const [depositAmount, depositAmountError] = useMemo(() => {
     if (depositInput === undefined || depositInput === "") {
@@ -80,7 +84,7 @@ export default function MintAndDepositTab({
   }, [mintInput]);
 
   const [redeemAmount, redeemAmountError] = useMemo(() => {
-    if (mintInput === undefined || mintInput === "") {
+    if (redeemInput === undefined || redeemInput === "") {
       return [undefined, undefined];
     }
     try {
@@ -91,28 +95,32 @@ export default function MintAndDepositTab({
   }, [redeemInput]);
 
   const { data: balanceData } = useBalance({
-    // enabled: !!selectedVault?.asset,
+    enabled: vault !== undefined,
     address,
-    token: (weth ?? "") as `0x${string}`,
+    token: vault?.isWrapped ? vault?.asset : undefined,
   });
+  console.log("balanceData", balanceData);
 
   const maxMint = useMemo(() => {
+    minCollateralizationRatio = "1700000000000000000";
     if (
-      totalValueLocked === undefined ||
-      minCollateralizationRatio === undefined ||
-      minCollateralizationRatio === BigInt(0) ||
-      dyadMinted === undefined
-    )
+      usdValue !== undefined &&
+      minCollateralizationRatio !== undefined &&
+      dyadMinted !== undefined
+    ) {
+      const a =
+        BigInt(usdValue) / BigInt(minCollateralizationRatio) -
+        BigInt(dyadMinted) / BigInt(10 ** 18);
+
+      return BigInt(a);
+    } else {
       return BigInt(0);
-    return (
-      (totalValueLocked * BigInt(10 ** 18)) / minCollateralizationRatio -
-      dyadMinted
-    );
-  }, [minCollateralizationRatio, totalValueLocked, dyadMinted]);
+    }
+  }, [minCollateralizationRatio, dyadMinted, usdValue]);
 
   const { data: allowance } = useContractRead({
-    // enabled: !!selectedVault?.asset,
-    address: weth,
+    enabled: vault !== undefined,
+    address: vault?.asset,
     abi: ERC20 as Abi,
     args: [address, payments as `0x${string}`],
     functionName: "allowance",
@@ -127,7 +135,8 @@ export default function MintAndDepositTab({
     write: approve,
     reset: approvalReset,
   } = useContractWrite({
-    address: weth,
+    enabled: vault !== undefined,
+    address: vault?.asset,
     abi: ERC20 as Abi,
     functionName: "approve",
     args: [payments, depositAmount ?? BigInt(0)],
@@ -154,8 +163,26 @@ export default function MintAndDepositTab({
   } = useContractWrite({
     address: payments,
     abi: PaymentsAbi["abi"],
+    functionName: "depositETHWithFee",
+    args: [selectedDnft, vault?.address],
+    value: parseEther((depositInput as string) ?? "0"),
+  });
+
+  const {
+    data: depositWithFeeTxData,
+    isLoading: isDepositWithFeeLoading,
+    isError: isDepositWithFeeError,
+    write: depositWithFee,
+    reset: depositWithFeeReset,
+  } = useContractWrite({
+    address: payments,
+    abi: PaymentsAbi["abi"],
     functionName: "depositWithFee",
-    args: [selectedDnft, vault, depositAmount ?? BigInt(0)],
+    args: [
+      selectedDnft,
+      vault?.address,
+      parseEther((depositInput as string) ?? "0"),
+    ],
   });
 
   const { isLoading: isDepositTxLoading, isError: isDepositTxError } =
@@ -171,6 +198,21 @@ export default function MintAndDepositTab({
       },
     });
 
+  const {
+    isLoading: isDepositWithFeeTxLoading,
+    isError: isDepositWithFeeTxError,
+  } = useWaitForTransaction({
+    hash: depositWithFeeTxData?.hash,
+    onError: (err) => {
+      console.error(err);
+      depositWithFeeReset();
+    },
+    onSuccess: () => {
+      depositWithFeeReset();
+      setDepositInput("");
+    },
+  });
+
   const setApproval = useCallback(() => {
     if (
       allowance !== undefined &&
@@ -183,6 +225,8 @@ export default function MintAndDepositTab({
 
   const requiresApproval = useMemo(
     () =>
+      vault !== undefined &&
+      vault.requiresApproval &&
       allowance !== undefined &&
       depositAmount !== undefined &&
       allowance < depositAmount,
@@ -239,7 +283,12 @@ export default function MintAndDepositTab({
     address: vaultManager,
     abi: VaultManagerAbi["abi"],
     functionName: "redeemDyad",
-    args: [selectedDnft ?? "0", redeemAmount ?? BigInt(0), address],
+    args: [
+      selectedDnft ?? "0",
+      vault?.address,
+      redeemAmount ?? BigInt(0),
+      address,
+    ],
   });
 
   const { isLoading: isRedeemTxLoading, isError: isRedeemTxError } =
@@ -259,20 +308,27 @@ export default function MintAndDepositTab({
     <div>
       {/* Deposit Component */}
       <div className="mb-4 p-4 border">
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 items-center">
           <Input
             type="text"
             placeholder="Amount to Deposit"
             className="w-full p-2 border mb-2"
             disabled={!selectedDnft}
             value={depositInput}
-            onChange={(e) => setDepositInput(e.target.value)}
+            onChange={(e) => {
+              setDepositInput(e.target.value);
+            }}
           />
+          <Info>
+            Deposit ETH or wETH into your Note as backing collateral for minting
+            DYAD. You must have a minimum of $1.50 deposited for each DYAD that
+            you mint, but we recommend more than that.
+          </Info>
           <Button
             variant="outline"
             // {/* className="p-2 border bg-gray-200" */}
             onClick={() => setDepositInput(balanceData?.formatted ?? "")}
-            // disabled={!selectedVault}
+            disabled={!selectedDnft}
           >
             MAX
           </Button>
@@ -281,7 +337,7 @@ export default function MintAndDepositTab({
           {depositAmountError
             ? depositAmountError
             : depositAmount && balanceData && depositAmount > balanceData?.value
-            ? "Insufficient wETH Balance"
+            ? `Insufficient ${vault?.symbol} Balance`
             : ""}
         </p>
         <p className="text-green-500 text-xs">
@@ -308,10 +364,20 @@ export default function MintAndDepositTab({
             ""
           )}
         </p>
-        <p className="text-sm leading-loose text-muted-foreground">
-          0.15% frontend fee: {isNaN(depositInput) ? 0 : depositInput * 0.0015}{" "}
-          wETH
-        </p>
+        <div className="text-sm leading-loose text-muted-foreground">
+          <p>
+            0.15% frontend fee:{" "}
+            {isNaN(depositInput) ? 0 : depositInput * 0.0015} ETH
+          </p>
+          <p>
+            {crAfterDeposit && (
+              <p>
+                New CR: <CR cr={crAfterDeposit} />%
+              </p>
+            )}
+          </p>
+        </div>
+
         <Button
           className="mt-4 p-2"
           variant="default"
@@ -322,59 +388,76 @@ export default function MintAndDepositTab({
             isApprovalLoading ||
             isApprovalTxLoading ||
             isDepositLoading ||
-            isDepositTxLoading
+            isDepositWithFeeLoading ||
+            isDepositTxLoading ||
+            isDepositWithFeeTxLoading
           }
           onClick={() => {
             approvalReset();
-            requiresApproval ? setApproval() : deposit();
+            requiresApproval
+              ? setApproval()
+              : !vault?.isWrapped
+              ? deposit()
+              : depositWithFee();
           }}
         >
           {isApprovalLoading ||
           isApprovalTxLoading ||
           isDepositLoading ||
+          isDepositWithFeeLoading ||
+          isDepositWithFeeTxLoading ||
           isDepositTxLoading ? (
             <Loader />
           ) : requiresApproval ? (
             "Approve"
           ) : (
-            `Deposit ${"WETH" ?? ""}`
+            `Deposit ${vault?.symbol ?? ""}`
           )}
         </Button>
-        <p className="text-red-500 text-xs pt-2">
-          {isApprovalError || isApprovalTxError
-            ? "Error approving token for deposit"
-            : isDepositError || isDepositTxError
-            ? "Error depositing token"
-            : ""}
-        </p>
+        {/* <p className="text-red-500 text-xs pt-2"> */}
+        {/*   {isApprovalError || isApprovalTxError */}
+        {/*     ? "Error approving token for deposit" */}
+        {/*     : isDepositError || isDepositTxError */}
+        {/*     ? "Error depositing token" */}
+        {/*     : ""} */}
+        {/* </p> */}
       </div>
 
       {/* Mint Component */}
       <div className="mb-4 p-4 border">
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 items-center">
           <Input
             type="text"
             placeholder="Amount to Mint"
             className="w-full p-2 border mb-2"
             value={mintInput}
-            onChange={(e) => setMintInput(e.target.value)}
+            onChange={(e) => {
+              setMintInput(e.target.value);
+            }}
             disabled={!selectedDnft}
           />
-          {/* <Button */}
-          {/*   className="p-2 border bg-gray-200" */}
-          {/*   onClick={() => setMintInput(maxMint ? formatEther(maxMint) : "")} */}
-          {/*   disabled={!selectedDnft} */}
-          {/* > */}
-          {/*   MAX */}
-          {/* </Button> */}
+          <Info>
+            Mint DYAD stablecoins against the ETH and wETH you deposit into your
+            Note. Your DYAD will be available in your connected wallet once you
+            mint it. The more DYAD you mint now, the more rewards you will be
+            able to claim in the near future.
+          </Info>
+
+          <Button
+            variant="outline"
+            onClick={() => setMintInput(maxMint.toString())}
+            disabled={!selectedDnft}
+          >
+            MAX
+          </Button>
         </div>
-        <p className="text-red-500 text-xs pb-2">
-          {mintAmountError
-            ? mintAmountError
-            : mintAmount && balanceData && mintAmount > maxMint
-            ? "Not enough collateral"
-            : ""}
-        </p>
+        {/* <p className="text-red-500 text-xs pb-2"> */}
+        {/*   {mintAmountError */}
+        {/*     ? mintAmountError */}
+        {/*     : mintAmount && balanceData && mintAmount > maxMint */}
+        {/*     ? "Not enough collateral" */}
+        {/*     : ""} */}
+        {/* </p> */}
         <p className="text-green-500 text-xs">
           {collatRatio ? (
             <>
@@ -396,6 +479,15 @@ export default function MintAndDepositTab({
             ""
           )}
         </p>
+        <div className="text-sm leading-loose text-muted-foreground">
+          <p>
+            {crAfterMint && (
+              <p>
+                New CR: <CR cr={crAfterMint} />%
+              </p>
+            )}
+          </p>
+        </div>
         <Button
           className="mt-4 p-2"
           variant="default"
@@ -421,7 +513,7 @@ export default function MintAndDepositTab({
 
       {/* Mint Component */}
       <div className="mb-4 p-4 border">
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 items-center">
           <Input
             type="text"
             placeholder="Amount to Redeem"
@@ -430,13 +522,20 @@ export default function MintAndDepositTab({
             onChange={(e) => setRedeemInput(e.target.value)}
             disabled={!selectedDnft}
           />
-          {/* <Button */}
-          {/*   className="p-2 border bg-gray-200" */}
-          {/*   onClick={() => setMintInput(maxMint ? formatEther(maxMint) : "")} */}
-          {/*   disabled={!selectedDnft} */}
-          {/* > */}
-          {/*   MAX */}
-          {/* </Button> */}
+          <Info>
+            Burn DYAD that you have in your connected wallet and receive the
+            equivalent dollar-denominated amount of wETH. Redeeming combines the
+            Burn and Withdraw functions automatically.
+          </Info>
+          <Button
+            variant="outline"
+            onClick={() =>
+              setRedeemInput((dyadMinted / BigInt(10 ** 18)).toString())
+            }
+            disabled={!selectedDnft}
+          >
+            MAX
+          </Button>
         </div>
         {/* <p className="text-red-500 text-xs pb-2"> */}
         {/*   {mintAmountError */}
@@ -471,7 +570,7 @@ export default function MintAndDepositTab({
           variant="default"
           disabled={
             redeemAmount === undefined ||
-            redeemAmountError !== undefined ||
+            // redeemAmountError !== undefined ||
             // redeemAmount > maxMint ||
             isRedeemLoading ||
             isRedeemTxLoading

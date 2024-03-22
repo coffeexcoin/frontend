@@ -8,17 +8,20 @@ export function Footer({
 }: React.HTMLAttributes<HTMLElement>) {
   return (
     <footer
-      className={cn("flex items-center space-x-4 lg:space-x-6 my-2", className)}
+      className={cn(
+        "flex items-center space-x-4 lg:space-x-6 my-2 mb-6",
+        className
+      )}
       {...props}
     >
       <Link
-        href="https://dyadstable.notion.site/DYAD-full-52096aed265247e7a50b14f06c228a7e?pvs=4"
+        href="https://www.notion.so/dyadstable/DYAD-design-outline-v3-28b79ebd6acb42009ff5a751c3158781?pvs=4"
         className="text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
       >
         Docs
       </Link>
       <Link
-        href="https://discord.gg/z3wdvqM3kt"
+        href="https://discord.gg/5GXYRHb6zU"
         className="text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
       >
         Discord
@@ -28,6 +31,12 @@ export function Footer({
         className="text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
       >
         Twitter
+      </Link>
+      <Link
+        href="https://github.com/DyadStablecoin"
+        className="text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+      >
+        Github
       </Link>
     </footer>
   );

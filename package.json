@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "codegen": "graphql-codegen",
     "dev": "next dev",
     "build": "wagmi generate && next build",
     "start": "next start",
-    "lint": "next lint",
-    "codegen": "graphql-codegen"
+    "lint": "next lint"
   },
   "dependencies": {
     "@nextui-org/react": "^2.2.9",

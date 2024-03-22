@@ -10,18 +10,16 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
-import {
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { round } from "../utils/currency";
 import VaultManagerAbi from "@/abis/VaultManager.json";
 import VaultAbi from "@/abis/Vault.json";
 import { Abi, formatEther, getAddress, numberToHex, parseEther } from "viem";
 import Loader from "./loader";
 import { crColor } from "@/lib/utils";
+import useCR from "@/hooks/useCR";
+import CR from "./cr";
+import Info from "./info.tsx";
+import useEthPrice from "@/hooks/useEthPrice";
 
 interface Props {
   setSelectedVaultId: (value: string) => void;
@@ -58,11 +56,30 @@ export default function BurnAndWithdrawTab({
   vaultManager,
   dyad,
   collatRatio,
+  usdValue,
+  id2asset,
+  selectedV,
 }: Props) {
   const [oldCR, setOldCR] = useState(0);
   const [withdrawInput, setWithdrawInput] = useState<string>();
   const [burnInput, setBurnInput] = useState<string>();
   const { address } = useAccount();
+
+  const { ethPrice } = useEthPrice();
+
+  const { cr: crAfterBurn } = useCR(
+    usdValue,
+    dyadMinted,
+    0,
+    -1 * parseFloat(burnInput)
+  );
+
+  const { cr: crAfterWithdraw } = useCR(
+    usdValue,
+    dyadMinted,
+    -1 * parseFloat(withdrawInput),
+    0
+  );
 
   const [withdrawAmount, withdrawAmountError] = useMemo(() => {
     if (withdrawInput === undefined || withdrawInput === "") {
@@ -91,10 +108,47 @@ export default function BurnAndWithdrawTab({
     token: dyad as `0x${string}`,
   });
 
+  const maxBurn = useMemo(() => {
+    // if (parseInt(dyadBalance.value) > parseInt(id2asset)) {
+    //   return id2asset;
+    // } else {
+    if (dyadBalance?.value === undefined) return 0;
+    return dyadBalance.value / BigInt(10 ** 18);
+    // }
+  }, [dyadBalance, id2asset]);
+
+  const maxWithdraw = useMemo(() => {
+    const minCollateralizationRatio = "1700000000000000000";
+    if (
+      usdValue !== undefined &&
+      minCollateralizationRatio !== undefined &&
+      dyadMinted !== undefined &&
+      ethPrice !== undefined
+    ) {
+      if (parseInt(dyadMinted) === 0) {
+        return id2asset / 10 ** 18;
+      }
+      try {
+        const a =
+          BigInt(usdValue) -
+          (BigInt(minCollateralizationRatio) * BigInt(dyadMinted)) /
+            BigInt(10 ** 18);
+        let total = 0;
+        total = parseEther((parseFloat(a) / 10 ** 18 / ethPrice).toString());
+        total = parseFloat(total) / 10 ** 18;
+        return total;
+      } catch {
+        return id2asset / 10 ** 18;
+      }
+    } else {
+      return id2asset / 10 ** 18;
+    }
+  }, [minCollateralizationRatio, dyadMinted, usdValue, ethPrice]);
+
   const { data: withdrawableBalance } = useContractReads({
     contracts: [
       {
-        address: selectedVault?.address as `0x${string}`,
+        address: vault?.address as `0x${string}`,
         abi: VaultAbi as Abi,
         functionName: "balanceOf",
         args: [
@@ -102,7 +156,7 @@ export default function BurnAndWithdrawTab({
         ],
       },
       {
-        address: selectedVault?.address as `0x${string}`,
+        address: vault?.address as `0x${string}`,
         abi: VaultAbi as Abi,
         functionName: "convertToAssets",
         args: [parseEther("1")],
@@ -126,7 +180,12 @@ export default function BurnAndWithdrawTab({
     address: vaultManager,
     abi: VaultManagerAbi["abi"],
     functionName: "withdraw",
-    args: [selectedDnft ?? "0", vault, withdrawAmount ?? BigInt(0), address],
+    args: [
+      selectedDnft ?? "0",
+      vault?.address,
+      withdrawAmount ?? BigInt(0),
+      address,
+    ],
   });
 
   const { isLoading: isWithdrawTxLoading, isError: isWithdrawTxError } =
@@ -189,6 +248,7 @@ export default function BurnAndWithdrawTab({
     burnAmount,
     withdrawAmount,
     selectedVault,
+    vault,
     collatRatio,
   ]);
 
@@ -196,7 +256,7 @@ export default function BurnAndWithdrawTab({
     <div>
       {/* Burn Component */}
       <div className="mb-4 p-4 border">
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 items-center">
           <Input
             type="text"
             placeholder="Amount to Burn"
@@ -205,32 +265,29 @@ export default function BurnAndWithdrawTab({
             onChange={(e) => setBurnInput(e.target.value)}
             disabled={!selectedDnft}
           />
+          <Info>
+            Burn DYAD that you have in your connected wallet to reduce your
+            Note’s DYAD minted balance. This raises your Note’s
+            collateralization ratio, which makes it safer from liquidation and
+            allows you to withdraw more deposited collateral.
+          </Info>
           <Button
             variant="outline"
-            onClick={() => setBurnInput(dyadBalance?.formatted ?? "")}
+            onClick={() => setBurnInput(maxBurn.toString())}
             disabled={!selectedDnft}
           >
             MAX
           </Button>
         </div>
-        <p className="text-red-500 text-xs">
-          {burnAmount &&
-          !burnAmountError &&
-          newCR !== undefined &&
-          minCollateralizationRatio ? (
-            <span
-              className={crColor(
-                +formatEther(newCR),
-                +formatEther(minCollateralizationRatio) * 3
-              )}
-            >
-              New CR:{" "}
-              {newCR > BigInt(0) ? `${+formatEther(newCR) * 100}%` : "Invalid"}
-            </span>
-          ) : (
-            ""
-          )}
-        </p>
+        <div className="text-sm leading-loose text-muted-foreground">
+          <p>
+            {crAfterBurn && (
+              <p>
+                New CR: <CR cr={crAfterBurn} />%
+              </p>
+            )}
+          </p>
+        </div>
         <Button
           className="mt-4 p-2"
           variant="default"
@@ -255,8 +312,8 @@ export default function BurnAndWithdrawTab({
         </p>
       </div>
       {/* Withdraw Component */}
-      <div className="mb-4 p-4 border">
-        <div className="flex space-x-4">
+      <div className="mb-4 p-4 border items-center">
+        <div className="flex space-x-4 items-center">
           <Input
             type="text"
             placeholder="Amount to Withdraw"
@@ -266,17 +323,18 @@ export default function BurnAndWithdrawTab({
             disabled={!selectedDnft}
             onChange={(e) => setWithdrawInput(e.target.value)}
           />
-          {/* <Button */}
-          {/*   className="p-2 border bg-gray-200" */}
-          {/*   disabled={!selectedVault} */}
-          {/*   onClick={() => */}
-          {/*     setWithdrawInput( */}
-          {/*       withdrawableBalance ? formatEther(withdrawableBalance) : "" */}
-          {/*     ) */}
-          {/*   } */}
-          {/* > */}
-          {/*   MAX */}
-          {/* </Button> */}
+          <Info>
+            Withdraw collateral that you have deposited into your Note. This
+            will reduce your collateralization ratio. You can only withdraw down
+            to the minimum 175% CR to protect your Note from liquidation.
+          </Info>
+          <Button
+            variant="outline"
+            disabled={!selectedDnft}
+            onClick={() => setWithdrawInput(maxWithdraw.toString())}
+          >
+            MAX
+          </Button>
         </div>
         <p className="text-red-500 text-xs">
           {!withdrawAmountError &&
@@ -296,11 +354,20 @@ export default function BurnAndWithdrawTab({
             ""
           )}
         </p>
+        <div className="text-sm leading-loose text-muted-foreground">
+          <p>
+            {crAfterWithdraw && (
+              <p>
+                New CR: <CR cr={crAfterWithdraw} />%
+              </p>
+            )}
+          </p>
+        </div>
         <Button
           className="mt-4 p-2"
           variant="default"
           disabled={
-            !selectedVault ||
+            // !selectedVault ||
             !withdrawAmount ||
             withdrawAmountError ||
             isWithdrawLoading ||
@@ -315,7 +382,7 @@ export default function BurnAndWithdrawTab({
           {isWithdrawLoading || isWithdrawTxLoading ? (
             <Loader />
           ) : (
-            `Withdraw ${selectedVault?.symbol ?? ""}`
+            `Withdraw ${vault?.symbol ?? ""}`
           )}
         </Button>
         <p className="text-red-500 text-xs pb-2">

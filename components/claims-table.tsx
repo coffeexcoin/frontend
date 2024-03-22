@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { formatEther, parseEther } from "viem";
-import { ArrowDownIcon, ArrowUpIcon } from "@radix-ui/react-icons";
+import { useState } from "react";
+import { formatEther } from "viem";
 
 // import { MintedNft_OrderBy, OrderDirection, useAllDnftMintsQuery } from "@/gql";
 import {
@@ -13,10 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Separator } from "@/components/ui/separator";
 import { shortAddr } from "@/lib/utils";
-import useModal from "@/contexts/modal";
-import DnftModalContent from "./dnft-modal-content";
 
 interface Props {
   className?: string;
@@ -104,63 +100,19 @@ export default function ClaimsTable({ className }: Props) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead
-              className="w-[80px] whitespace-nowrap cursor-pointer"
-              onClick={() => {
-                handleHeaderClick(MintedNft_OrderBy.DNftId);
-              }}
-            >
-              Note ID
-              {sortBy === MintedNft_OrderBy.DNftId &&
-                (sortDir === OrderDirection.Asc ? (
-                  <ArrowUpIcon className="w-3 h-3 ml-1 inline" />
-                ) : (
-                  <ArrowDownIcon className="w-3 h-3 ml-1 inline" />
-                ))}
-            </TableHead>
-            <TableHead>Owner</TableHead>
-            <TableHead
-              onClick={() => handleHeaderClick(MintedNft_OrderBy.DNftId)}
-              className="cursor-pointer"
-            >
-              CR
-            </TableHead>
-            <TableHead
-              className="text-right cursor-pointer"
-              onClick={() => handleHeaderClick(MintedNft_OrderBy.DNftId)}
-            >
-              DYAD Minted
-            </TableHead>
-            <TableHead
-              className="text-right cursor-pointer"
-              onClick={() => handleHeaderClick(MintedNft_OrderBy.DNftId)}
-            >
-              Collateral
-            </TableHead>
+            <TableHead className="w-[100px]">User</TableHead>
+            <TableHead>dNFT ID</TableHead>
+            <TableHead>Contribution</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data?.mintedNfts.map((mint) => (
-            <TableRow
-              key={mint.DNft_id}
-              onClick={openModal}
-              className="cursor-pointer h-12"
-            >
-              <TableCell>#{mint.DNft_id}</TableCell>
+            <TableRow key={mint.DNft_id}>
               <TableCell className="font-medium">
                 {shortAddr(mint.to)}
               </TableCell>
-              <TableCell
-                className={`${crColor(+formatEther(mint.price) * 100)}`}
-              >
-                {(+formatEther(mint.price) * 100).toFixed(2)}%
-              </TableCell>
-              <TableCell className="font-medium text-right">
-                {+formatEther(mint.price) * 1000}
-              </TableCell>
-              <TableCell className="font-medium text-right">
-                ${(+formatEther(mint.price) * 100).toFixed(2)}
-              </TableCell>
+              <TableCell>#{mint.DNft_id}</TableCell>
+              <TableCell>{formatEther(mint.price)} ETH</TableCell>
             </TableRow>
           ))}
         </TableBody>
