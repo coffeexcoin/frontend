@@ -10,6 +10,7 @@ import {
   useReadVaultManagerMinCollaterizationRatio,
   vaultManagerAbi,
   vaultManagerAddress,
+  wEthVaultAbi,
 } from "@/generated";
 import { defaultChain } from "@/lib/config";
 import NoteNumber from "./Children/NoteNumber";
@@ -17,9 +18,10 @@ import { NoteNumberDataColumnModel } from "@/models/NoteCardModels";
 import { TabsDataModel } from "@/models/TabsModel";
 import Deposit, { supportedVaults } from "./Children/Deposit";
 import Mint from "./Children/Mint";
-import { useReadContracts } from "wagmi";
+import { useReadContract, useReadContracts } from "wagmi";
 import { maxUint256 } from "viem";
 import { formatNumber, fromBigNumber } from "@/lib/utils";
+import { vaultInfo } from "@/lib/constants";
 
 function NoteCard({ tokenId }: { tokenId: string }) {
   const { data: collatRatio } = useReadVaultManagerCollatRatio({
@@ -48,6 +50,22 @@ function NoteCard({ tokenId }: { tokenId: string }) {
     allowFailure: false,
   });
   const hasVault = (hasVaultData?.filter((data) => !!data)?.length || 0) > 0;
+
+  const { data: vaultCollateral } = useReadContracts({
+    contracts: supportedVaults.map((address) => ({
+      address: address,
+      abi: wEthVaultAbi,
+      functionName: "getUsdValue",
+      args: [BigInt(tokenId)],
+      chainId: defaultChain.id,
+    })),
+    allowFailure: false,
+  });
+
+  const vaultUsd = vaultCollateral?.map((value, i) => ({
+    value: fromBigNumber(value),
+    label: vaultInfo[i].symbol,
+  })).filter((data) => !!data.value);
 
   const { data: minCollateralizationRatio } =
     useReadVaultManagerMinCollaterizationRatio({ chainId: defaultChain.id });
@@ -90,7 +108,7 @@ function NoteCard({ tokenId }: { tokenId: string }) {
             parseFloat(maxDyad.toString()) - fromBigNumber(mintedDyad),
             fromBigNumber(mintedDyad),
           ]}
-          collateral={formatNumber(fromBigNumber(collateralValue))}
+          collateral={vaultUsd as any}
         />
       ) : (
         <p>Deposit collateral to open vault</p>
