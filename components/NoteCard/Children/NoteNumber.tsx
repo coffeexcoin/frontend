@@ -6,35 +6,25 @@ import {
   PIE_CHART_MOCK_DATA,
   PIE_CHART_OPTIONS,
 } from "@/mockData/tabsMockData";
-import PieChartComponent from "@/components/reusable/PieChartComponent";
+import PieChartComponent, { Data } from "@/components/reusable/PieChartComponent";
 
 interface NoteNumberProps {
   data: NoteNumberDataColumnModel[];
   dyad: number[];
-  collateral: string;
+  collateral: Data[];
 }
 
 const NoteNumber: React.FC<NoteNumberProps> = ({ data, dyad, collateral }) => {
-  const pieData = {
-    width: "50",
-    datasets: [
-      {
-        rotation: -50,
-        data: dyad,
-        labels: ["DYAD mintable", "DYAD minted"],
-        backgroundColor: ["#45E845", "#DEDEDE"],
-        borderWidth: 0,
-        cutout: 85,
-      },
-      {
-        labels: ["WETH"],
-        data: [collateral],
-        backgroundColor: ["#8D8D8D", "#676767", "#EDEDED"],
-        borderWidth: 0,
-        radius: "155%",
-      },
-    ],
-  };
+  const dyadData = [
+    {
+      label: "DYAD mintable",
+      value: dyad[0],
+    },
+    {
+      label: "DYAD minted",
+      value: dyad[1],
+    },
+  ];
 
   return (
     <div className="flex justify-between">
@@ -42,7 +32,8 @@ const NoteNumber: React.FC<NoteNumberProps> = ({ data, dyad, collateral }) => {
         <div className="w-[295px] justify-center mt-[20px]">
           <div className="w-[185px] m-auto">
             <PieChartComponent
-              data={pieData}
+              outsideData={dyadData}
+              insideData={collateral}
               options={{
                 plugins: {
                   tooltip: {
