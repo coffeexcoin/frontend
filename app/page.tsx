@@ -1,6 +1,5 @@
 "use client";
 
-import TabsComponent from "@/components/reusable/TabsComponent";
 import ButtonComponent from "@/components/reusable/ButtonComponent";
 import KeroseneCard from "@/components/KeroseneCard/KeroseneCard";
 import NoteCard from "@/components/NoteCard/NoteCard";
@@ -15,6 +14,12 @@ import { useAccount } from "wagmi";
 import { dNftAddress } from "@/generated";
 import { defaultChain } from "@/lib/config";
 import { SnapshotClaim } from "@/components/NoteCard/Children/SnapshotClaim";
+import dynamic from "next/dynamic";
+
+const TabsComponent = dynamic(
+  () => import("@/components/reusable/TabsComponent"),
+  { ssr: false }
+);
 
 export default function Home() {
   const [selectedValue, setSelectedValue] = useState("");
@@ -83,24 +88,24 @@ export default function Home() {
   const tabsData = [
     {
       label: "Manage Notes",
-      tabKey: "Manage Notes",
+      tabKey: "notes",
       content: manageNotesContent,
     },
     {
       label: "Earn Kerosene",
-      tabKey: "Earn Kerosene",
+      tabKey: "earn-kerosene",
       content: <p>Coming Soon</p>,
     },
     {
       label: "Check Eligibility",
-      tabKey: "Check Eligibility",
+      tabKey: "airdrop",
       content: <SnapshotClaim />,
     },
   ];
 
   return (
     <div className="flex-1 max-w-screen-md w-[745px] p-4 mt-4">
-      <TabsComponent tabsData={tabsData} />
+      <TabsComponent tabsData={tabsData} urlUpdate/>
     </div>
   );
 }
