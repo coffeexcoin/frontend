@@ -134,21 +134,23 @@ const EditVaultTabContent: React.FC<EditVaultTabContentProps> = ({
 
       <div className="flex gap-8">
         {allowance === 0n && action === "deposit" ? (
-          <ButtonComponent
-            onClick={() =>
-              setTransactionData({
-                config: {
-                  address: token,
-                  abi: erc20Abi,
-                  functionName: "approve",
-                  args: [vaultManagerAddress[defaultChain.id], maxUint256],
-                },
-                description: "Approve collateral for deposit",
-              })
-            }
-          >
-            Approve
-          </ButtonComponent>
+          <div className="w-[100px]">
+            <ButtonComponent
+              onClick={() =>
+                setTransactionData({
+                  config: {
+                    address: token,
+                    abi: erc20Abi,
+                    functionName: "approve",
+                    args: [vaultManagerAddress[defaultChain.id], maxUint256],
+                  },
+                  description: "Approve collateral for deposit",
+                })
+              }
+            >
+              Approve
+            </ButtonComponent>
+          </div>
         ) : (
           <DialogClose>
             <ButtonComponent
