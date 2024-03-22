@@ -1,73 +1,116 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
- 
+
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
- 
+
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
- 
+
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
- 
+
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
- 
+
     --primary: 240 5.9% 10%;
     --primary-foreground: 0 0% 98%;
- 
+
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
- 
+
     --accent: 240 4.8% 95.9%;
     --accent-foreground: 240 5.9% 10%;
- 
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
- 
+
     --ring: 240 5% 64.9%;
- 
+
     --radius: 0.5rem;
+
+    *::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+
+    /* Hide scroll corner */
+    *::-webkit-scrollbar-corner {
+      display: none;
+    }
+
+    /* Handle */
+    *::-webkit-scrollbar-thumb {
+      background: #282828;
+      border-radius: 10px;
+    }
+
+    /* Handle on hover */
+    *::-webkit-scrollbar-thumb:hover {
+      background: #282828;
+    }
   }
- 
+
+  .table-header {
+    border-radius: 0px !important;
+    background: #1a1a1a !important;
+    color: #a1a1aa !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9 !important;
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+  }
+
+  .table-row {
+    border-bottom: 1px solid #282828 !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    /* padding-right: 20px !important; */
+    /* padding-left: 0px !important; */
+    color: #ffffff;
+  }
+
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
- 
+
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
- 
+
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
- 
+
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
- 
+
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
- 
+
     --primary: 0 0% 98%;
     --primary-foreground: 240 5.9% 10%;
- 
+
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
- 
+
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
- 
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 85.7% 97.3%;
- 
+
     --ring: 240 3.7% 15.9%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
@@ -77,14 +120,15 @@
   }
 }
 
-@media only screen and (max-width: 600px) {
-  .hide-on-mobile {
-    display: none; 
-  }
+.mobile-view {
+  display: none;
 }
 
-@media only screen and (min-width: 601px) {
-  .show-on-mobile {
-    display: none; 
+@media only screen and (max-width: 745px) {
+  .desktop-view {
+    display: none;
+  }
+  .mobile-view {
+    display: block;
   }
 }

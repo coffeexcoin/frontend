@@ -16,7 +16,7 @@ export function MainNav({
     >
       <Link
         href="/"
-        className="text-sm font-bold transition-colors hover:text-primary"
+        className="text-2xl font-bold transition-colors hover:text-primary"
       >
         DYAD
       </Link>
@@ -26,12 +26,12 @@ export function MainNav({
       {/* > */}
       {/*   Vaults */}
       {/* </Link> */}
-      <Link
+      {/* <Link
         href="/notes"
         className="text-sm font-bold text-muted-foreground transition-colors hover:text-primary"
       >
         Notes
-      </Link>
+      </Link> */}
     </nav>
   );
 }

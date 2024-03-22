@@ -14,7 +14,7 @@ export function Modal({ isOpen, shiftModal, children }: Props) {
         onClick={shiftModal}
       >
         <Card
-          className="p-4 max-w-full flex flex-col justify-start items-left min-w-sm"
+          className="max-w-full flex flex-col justify-start items-left min-w-sm"
           onClick={(e) => {
             e.stopPropagation();
           }}

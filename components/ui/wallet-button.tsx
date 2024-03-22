@@ -1,50 +1,24 @@
-import { useCallback, useEffect } from "react";
-import { useAccount, useConnect, useDisconnect, useNetwork } from "wagmi";
-import { switchNetwork } from "@wagmi/core";
-import { InjectedConnector } from "wagmi/connectors/injected";
+"use client";
 
-import { Button } from "@/components/ui/button";
-import { deployments } from "@/lib/deployments";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { Button } from "./button";
+import { useAccount } from "wagmi";
 
 interface Props {
   className?: string;
 }
 
 export default function WalletButton({ className }: Props) {
+  const { open } = useWeb3Modal();
   const { isConnected } = useAccount();
-  const { chain } = useNetwork();
-
-  const { connect } = useConnect({
-    connector: new InjectedConnector(),
-  });
-
-  const { disconnect } = useDisconnect();
-
-  const handleClick = useCallback(() => {
-    if (isConnected) {
-      disconnect();
-    } else {
-      connect();
-    }
-  }, [isConnected, connect, disconnect]);
-
-  useEffect(() => {
-    if (chain && !deployments[chain.id]) {
-      switchNetwork({
-        chainId: process.env.DEFAULT_NETWORK_ID
-          ? +process.env.DEFAULT_NETWORK_ID
-          : +Object.keys(deployments)[0],
-      });
-    }
-  }, [chain]);
+  
+  if (isConnected) {
+    return <w3m-account-button />;
+  }
 
   return (
-    <Button
-      onClick={handleClick}
-      variant={isConnected ? "default" : "outline"}
-      className={className}
-    >
-      {isConnected ? "Disconnect" : "Connect"}
+    <Button onClick={() => open()} className={className}>
+      Connect Wallet
     </Button>
   );
 }
