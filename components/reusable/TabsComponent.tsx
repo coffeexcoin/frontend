@@ -8,19 +8,21 @@ interface tabsComponentPropsInterface {
   tabsData: TabsDataModel[];
   logo?: string | JSX.Element;
   inModal?: boolean;
+  urlUpdate?: boolean;
 }
 
 export default function TabsComponent({
   tabsData,
   logo,
   inModal = false,
+  urlUpdate = false
 }: tabsComponentPropsInterface) {
   const [selected, setSelected] = useState<Key>(tabsData[0].tabKey);
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (searchParams.get("tab")) {
+    if (searchParams.get("tab") && urlUpdate) {
       setSelected(searchParams.get("tab") as Key);
     }
   }, []);
@@ -45,7 +47,10 @@ export default function TabsComponent({
           selectedKey={selected}
           onSelectionChange={(key) => {
             setSelected(key);
-            router.replace("?tab=" + key);
+            if(urlUpdate) {
+              router.replace("?tab=" + key);
+            }
+            
           }}
           classNames={{
             base: "w-full",
