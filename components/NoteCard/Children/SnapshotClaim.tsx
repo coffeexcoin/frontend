@@ -14,7 +14,7 @@ export const SnapshotClaim = () => {
   const handleCheck = () => {
     if (isAddress(address)) {
       setInvalidAddress(false);
-      const data = claimData.find((data) => data.address === address);
+      const data = claimData.find((data) => data.address.toLowerCase() === address.toLowerCase());
       setButtonClicked(true);
       setClaimAmount(data?.amount || 0);
     } else {
@@ -43,7 +43,7 @@ export const SnapshotClaim = () => {
         <div className="flex gap-8 items-center">
           <p>Address: {address}</p>
           {claimAmount > 0 ? (
-            <p className="text-green-500">{formatNumber(claimAmount)} Kerosene</p>
+            <p className="text-green-500">{formatNumber(claimAmount, 0)} Kerosene</p>
           ) : (
             <p className="text-red-500">Not Eligible</p>
           )}
