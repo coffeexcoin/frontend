@@ -83,17 +83,17 @@ export default function Home() {
   const tabsData = [
     {
       label: "Manage Notes",
-      tabKey: "Manage Notes",
+      tabKey: "notes",
       content: manageNotesContent,
     },
     {
       label: "Earn Kerosene",
-      tabKey: "Earn Kerosene",
+      tabKey: "earn-kerosene",
       content: <p>Coming Soon</p>,
     },
     {
       label: "Check Eligibility",
-      tabKey: "Check Eligibility",
+      tabKey: "snapshot",
       content: <SnapshotClaim />,
     },
   ];

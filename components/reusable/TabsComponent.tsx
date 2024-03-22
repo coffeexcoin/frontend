@@ -1,7 +1,8 @@
-import React from "react";
+import React, { Key, useEffect, useState } from "react";
 import { Tabs, Tab } from "@nextui-org/react";
 import { TabsDataModel } from "@/models/TabsModel";
 import { cn } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface tabsComponentPropsInterface {
   tabsData: TabsDataModel[];
@@ -14,9 +15,22 @@ export default function TabsComponent({
   logo,
   inModal = false,
 }: tabsComponentPropsInterface) {
+  const [selected, setSelected] = useState<Key>(tabsData[0].tabKey);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("tab")) {
+      setSelected(searchParams.get("tab") as Key);
+    }
+  }, []);
+
   return (
     <div
-      className={cn("w-full px-2 flex relative", inModal && "max-w-[464px] pr-6")}
+      className={cn(
+        "w-full px-2 flex relative",
+        inModal && "max-w-[464px] pr-6"
+      )}
     >
       <div className={cn("w-full", inModal && "max-w-[464px]")}>
         {logo && (
@@ -28,6 +42,11 @@ export default function TabsComponent({
           variant="underlined"
           aria-label="Tabs variants"
           className="p-0 w-full"
+          selectedKey={selected}
+          onSelectionChange={(key) => {
+            setSelected(key);
+            router.replace("?tab=" + key);
+          }}
           classNames={{
             base: "w-full",
             tabList: `justify-between ${
