@@ -5,16 +5,15 @@ import ButtonComponent from "@/components/reusable/ButtonComponent";
 import { DialogClose } from "@/components/ui/dialog";
 import { BigIntInput } from "@/components/reusable/BigIntInput";
 import { formatNumber, fromBigNumber, toBigNumber } from "@/lib/utils";
-import { Address, erc20Abi } from "viem";
+import { Address, erc20Abi, maxUint256 } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 import { useTransactionStore } from "@/lib/store";
 import {
   useReadDyadMintedDyad,
-  useReadVaultAssetPrice,
-  useReadVaultGetUsdValue,
   useReadVaultManagerMinCollaterizationRatio,
   vaultManagerAbi,
   vaultManagerAddress,
+  wEthVaultAbi,
 } from "@/generated";
 import { defaultChain } from "@/lib/config";
 
@@ -44,12 +43,26 @@ const EditVaultTabContent: React.FC<EditVaultTabContentProps> = ({
     chainId: defaultChain.id,
   });
 
-  const { data: collateralValue } = useReadVaultGetUsdValue({
+  const { data: collateralValue } = useReadContract({
+    address: vaultAddress,
+    abi: wEthVaultAbi,
+    functionName: "getUsdValue",
     args: [BigInt(tokenId)],
     chainId: defaultChain.id,
   });
 
-  const { data: assetValue } = useReadVaultAssetPrice({
+  const { data: assetValue } = useReadContract({
+    address: vaultAddress,
+    abi: wEthVaultAbi,
+    functionName: "assetPrice",
+    chainId: defaultChain.id,
+  });
+
+  const { data: allowance } = useReadContract({
+    address: token,
+    abi: erc20Abi,
+    functionName: "allowance",
+    args: [address!, vaultManagerAddress[defaultChain.id]],
     chainId: defaultChain.id,
   });
 
@@ -120,29 +133,47 @@ const EditVaultTabContent: React.FC<EditVaultTabContentProps> = ({
       )}
 
       <div className="flex gap-8">
-        <DialogClose>
+        {allowance === 0n && action === "deposit" ? (
           <ButtonComponent
-            onClick={() => {
+            onClick={() =>
               setTransactionData({
                 config: {
-                  address: vaultManagerAddress[defaultChain.id],
-                  abi: vaultManagerAbi,
-                  functionName: action === "redeem" ? "redeemDyad" : action,
-                  args:
-                    action === "deposit"
-                      ? [tokenId, vaultAddress, inputValue]
-                      : [tokenId, vaultAddress, inputValue, address],
+                  address: token,
+                  abi: erc20Abi,
+                  functionName: "approve",
+                  args: [vaultManagerAddress[defaultChain.id], maxUint256],
                 },
-                description: `${action} ${formatNumber(fromBigNumber(inputValue), 4)} ${action === "redeem" ? "DYAD" : symbol}`,
-              });
-              setInputValue("");
-            }}
-            disabled={!inputValue}
-            variant="solid"
+                description: "Approve collateral for deposit",
+              })
+            }
           >
-            <p className="capitalize">{action}</p>
+            Approve
           </ButtonComponent>
-        </DialogClose>
+        ) : (
+          <DialogClose>
+            <ButtonComponent
+              onClick={() => {
+                setTransactionData({
+                  config: {
+                    address: vaultManagerAddress[defaultChain.id],
+                    abi: vaultManagerAbi,
+                    functionName: action === "redeem" ? "redeemDyad" : action,
+                    args:
+                      action === "deposit"
+                        ? [tokenId, vaultAddress, inputValue]
+                        : [tokenId, vaultAddress, inputValue, address],
+                  },
+                  description: `${action} ${formatNumber(fromBigNumber(inputValue), 4)} ${action === "redeem" ? "DYAD" : symbol}`,
+                });
+                setInputValue("");
+              }}
+              disabled={!inputValue}
+              variant="solid"
+            >
+              <p className="capitalize">{action}</p>
+            </ButtonComponent>
+          </DialogClose>
+        )}
 
         <DialogClose>
           <ButtonComponent variant="bordered">Cancel</ButtonComponent>

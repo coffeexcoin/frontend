@@ -3,36 +3,25 @@
 import React from "react";
 import NoteCardsContainer from "../reusable/NoteCardsContainer";
 import TabsComponent from "../reusable/TabsComponent";
-import { TABS_MOCK_DATA, VAULT_CARDS_DATA } from "@/mockData/tabsMockData";
 import {
   useReadDyadMintedDyad,
-  useReadVaultGetUsdValue,
   useReadVaultManagerCollatRatio,
-  useReadVaultManagerHasVault,
+  useReadVaultManagerGetTotalUsdValue,
   useReadVaultManagerMinCollaterizationRatio,
-  useReadWethAllowance,
-  vaultAddress,
   vaultManagerAbi,
   vaultManagerAddress,
-  wethAbi,
-  wethAddress,
 } from "@/generated";
 import { defaultChain } from "@/lib/config";
-import { Button } from "../ui/button";
-import { useTransactionStore } from "@/lib/store";
 import NoteNumber from "./Children/NoteNumber";
 import { NoteNumberDataColumnModel } from "@/models/NoteCardModels";
 import { TabsDataModel } from "@/models/TabsModel";
-import Deposit from "./Children/Deposit";
+import Deposit, { supportedVaults } from "./Children/Deposit";
 import Mint from "./Children/Mint";
-import { useAccount } from "wagmi";
+import { useReadContracts } from "wagmi";
 import { maxUint256 } from "viem";
 import { formatNumber, fromBigNumber } from "@/lib/utils";
 
 function NoteCard({ tokenId }: { tokenId: string }) {
-  const { setTransactionData } = useTransactionStore();
-  const { address } = useAccount();
-
   const { data: collatRatio } = useReadVaultManagerCollatRatio({
     args: [BigInt(tokenId)],
     chainId: defaultChain.id,
@@ -43,21 +32,22 @@ function NoteCard({ tokenId }: { tokenId: string }) {
     chainId: defaultChain.id,
   });
 
-  const { data: collateralValue } = useReadVaultGetUsdValue({
+  const { data: collateralValue } = useReadVaultManagerGetTotalUsdValue({
     args: [BigInt(tokenId)],
     chainId: defaultChain.id,
   });
 
-  const { data: hasVault } = useReadVaultManagerHasVault({
-    //TODO change for all vaults
-    args: [BigInt(tokenId), vaultAddress[defaultChain.id]],
-    chainId: defaultChain.id,
+  const { data: hasVaultData } = useReadContracts({
+    contracts: supportedVaults.map((address) => ({
+      address: vaultManagerAddress[defaultChain.id],
+      abi: vaultManagerAbi,
+      functionName: "hasVault",
+      args: [BigInt(tokenId), address],
+      chainId: defaultChain.id,
+    })),
+    allowFailure: false,
   });
-
-  const { data: allowance } = useReadWethAllowance({
-    args: [address!, vaultManagerAddress[defaultChain.id]],
-    chainId: defaultChain.id,
-  });
+  const hasVault = (hasVaultData?.filter((data) => !!data)?.length || 0) > 0;
 
   const { data: minCollateralizationRatio } =
     useReadVaultManagerMinCollaterizationRatio({ chainId: defaultChain.id });
@@ -109,30 +99,13 @@ function NoteCard({ tokenId }: { tokenId: string }) {
     {
       label: "Deposit & Withdraw",
       tabKey: "Deposit and Withdraw",
-      content:
-        allowance && allowance > 0n ? (
-          <Deposit
-            total_collateral={totalCollateral}
-            collateralization_ratio={collatRatio}
-            tokenId={tokenId}
-          />
-        ) : (
-          <Button
-            onClick={() =>
-              setTransactionData({
-                config: {
-                  address: wethAddress[defaultChain.id],
-                  abi: wethAbi,
-                  functionName: "approve",
-                  args: [vaultManagerAddress[defaultChain.id], maxUint256],
-                },
-                description: "Approve WETH for deposit",
-              })
-            }
-          >
-            Approve
-          </Button>
-        ),
+      content: (
+        <Deposit
+          total_collateral={totalCollateral}
+          collateralization_ratio={collatRatio}
+          tokenId={tokenId}
+        />
+      ),
     },
     {
       label: "Mint & Burn",

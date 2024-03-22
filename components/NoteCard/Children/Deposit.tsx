@@ -3,10 +3,9 @@ import EditVaultTabContent from "@/components/Modals/NoteCardModals/DepositModal
 import {
   useReadVaultManagerCollatRatio,
   useReadVaultManagerHasVault,
-  vaultAbi,
-  vaultAddress,
   vaultManagerAbi,
   vaultManagerAddress,
+  wEthVaultAbi,
 } from "@/generated";
 import { defaultChain } from "@/lib/config";
 import { useReadContract, useReadContracts } from "wagmi";
@@ -24,7 +23,7 @@ interface DepositProps {
   collateralization_ratio: bigint | undefined;
 }
 
-export const supportedVaults = [vaultAddress[defaultChain.id]];
+export const supportedVaults = vaultInfo.map((info) => info.vaultAddress);
 
 const Deposit: React.FC<DepositProps> = ({
   tokenId,
@@ -66,7 +65,7 @@ const Deposit: React.FC<DepositProps> = ({
         </div>
       </div>
       <div className="grid grid-cols-5 gap-[30px]">
-        {supportedVaults.map((address, i) => (
+        {supportedVaults.filter((_,i) => !!vaultData?.at(i)).map((address, i) => (
           <Vault key={i} tokenId={tokenId} vaultAddress={address} />
         ))}
         {availableVaults &&
@@ -97,7 +96,7 @@ const Vault = ({
   const { data: collateralValue, isLoading: collateralLoading } =
     useReadContract({
       address: vaultAddress,
-      abi: vaultAbi,
+      abi: wEthVaultAbi,
       args: [BigInt(tokenId)],
       functionName: "getUsdValue",
       chainId: defaultChain.id,

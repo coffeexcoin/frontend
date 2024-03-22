@@ -89,7 +89,7 @@ export default function Home() {
     {
       label: "Earn Kerosene",
       tabKey: "Earn Kerosene",
-      content: keroseneData,
+      content: <p>Coming Soon</p>,
     },
     {
       label: "Check Eligibility",
