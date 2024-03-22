@@ -98,7 +98,7 @@ export default function Home() {
     },
     {
       label: "Check Eligibility",
-      tabKey: "snapshot",
+      tabKey: "airdrop",
       content: <SnapshotClaim />,
     },
   ];
