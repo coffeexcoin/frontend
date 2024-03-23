@@ -29,16 +29,15 @@ const PieChartComponent: React.FC<PieChartComponentProps> = ({
   outsideData,
   options = {},
 }) => {
-  console.log(outsideData, insideData);
   return (
     <PieChart width={185} height={185}>
-      <Pie data={insideData} dataKey="value" outerRadius={60}>
+      <Pie data={insideData} dataKey="value" outerRadius={60} stroke="none">
         {insideData?.map((entry, index) => (
-          <Cell key={`cell-${index}`} fill={insideFillColors[index]} />
+          <Cell key={`cell-${index}`} fill={insideFillColors[index]}/>
         ))}
       </Pie>
       <Tooltip content={<CustomTooltip />} />
-      <Pie data={outsideData} dataKey="value" innerRadius={70} outerRadius={80}>
+      <Pie data={outsideData} dataKey="value" innerRadius={70} outerRadius={80} stroke="none">
         {outsideData?.map((entry, index) => (
           <Cell key={`cell-${index}`} fill={outsideFillColors[index]} />
         ))}
