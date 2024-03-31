@@ -15,6 +15,7 @@ import { dNftAddress } from "@/generated";
 import { defaultChain } from "@/lib/config";
 import { SnapshotClaim } from "@/components/NoteCard/Children/SnapshotClaim";
 import dynamic from "next/dynamic";
+import { HealthDashboard } from "@/components/NoteCard/Children/HealthDashboard";
 
 const TabsComponent = dynamic(
   () => import("@/components/reusable/TabsComponent"),
@@ -101,6 +102,11 @@ export default function Home() {
       tabKey: "airdrop",
       content: <SnapshotClaim />,
     },
+    {
+      label: "Health Dashboard",
+      tabKey: "health-dashboard",
+      content: <HealthDashboard />
+    }
   ];
 
   return (
