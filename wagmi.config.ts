@@ -1,13 +1,13 @@
-import { defineConfig } from "@wagmi/cli";
-import { react } from "@wagmi/cli/plugins";
-import { mainnet, sepolia } from "viem/chains";
-import { dnftAbi } from "@/lib/abi/Dnft";
-import { licenserAbi } from "@/lib/abi/Licenser";
-import { dyadAbi } from "@/lib/abi/Dyad";
-import { vaultManagerAbi } from "@/lib/abi/VaultManager";
-import { vaultAbi } from "@/lib/abi/Vault";
-import { paymentsAbi } from "@/lib/abi/Payments";
-import { erc20Abi } from "viem";
+import {defineConfig} from "@wagmi/cli";
+import {react} from "@wagmi/cli/plugins";
+import {mainnet, sepolia} from "viem/chains";
+import {dnftAbi} from "@/lib/abi/Dnft";
+import {licenserAbi} from "@/lib/abi/Licenser";
+import {dyadAbi} from "@/lib/abi/Dyad";
+import {vaultManagerAbi} from "@/lib/abi/VaultManager";
+import {vaultAbi} from "@/lib/abi/Vault";
+import {paymentsAbi} from "@/lib/abi/Payments";
+import {erc20Abi} from "viem";
 
 export default defineConfig({
   out: "generated.ts",

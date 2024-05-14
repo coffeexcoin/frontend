@@ -1,7 +1,9 @@
-import { useState } from "react";
+import {useState} from "react";
+import {useWriteContract} from "wagmi";
 import InputComponent from "@/components/reusable/InputComponent";
 import ButtonComponent from "@/components/reusable/ButtonComponent";
 import NoteCardsContainer from "../reusable/NoteCardsContainer";
+import StakingAbi from "@/abis/Staking.json";
 
 interface KeroseneProps {
   currency: string;
@@ -30,6 +32,11 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
   const stakeHandler = () => console.log("Staked");
   const unstakeHandler = () => console.log("Unstaked");
 
+  console.log("staking", StakingAbi.abi);
+
+  const {writeContract, failureReason} = useWriteContract()
+  console.log("fff", failureReason)
+
   return (
     <NoteCardsContainer>
       <div className="text-sm font-semibold text-[#A1A1AA]">
@@ -53,7 +60,14 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
             </ButtonComponent>
           </div>
           <div className="w-[128px]">
-            <ButtonComponent onClick={stakeHandler}>Stake</ButtonComponent>
+            <ButtonComponent onClick={() => writeContract(
+              {
+                address: "0x7363936FC85575Ff59D721B2B0171584880ba55B",
+                abi: StakingAbi.abi,
+                functionName: "stake",
+                args: [stakeInputValue],
+              }
+            )}>Stake</ButtonComponent>
           </div>
         </div>
         <div className="flex justify-between mt-[32px]">

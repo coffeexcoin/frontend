@@ -13,10 +13,12 @@ import {defaultChain} from "@/lib/config";
 import {useTransactionStore} from "@/lib/store";
 import ButtonComponent from "@/components/reusable/ButtonComponent";
 import KeroseneCard from "@/components/KeroseneCard/KeroseneCard";
+import StakingAbi from "@/abis/Staking.json";
 
 export function EarnKeroseneContent() {
   const {address, isConnected} = useAccount();
   const {setTransactionData} = useTransactionStore();
+  console.log("staking", StakingAbi.abi);
 
   const {data: startingPrice} = useReadDNftStartPrice({
     chainId: defaultChain.id,
