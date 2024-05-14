@@ -33,7 +33,7 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
   const stakeHandler = () => console.log("Staked");
   const unstakeHandler = () => console.log("Unstaked");
 
-  const STAKING_CONTRACT =  "0x8e0e695fEC31d5502C2f3E860Fe560Ea80b03E1D"
+  const STAKING_CONTRACT = "0x8e0e695fEC31d5502C2f3E860Fe560Ea80b03E1D"
 
   console.log("staking", StakingAbi.abi);
 
