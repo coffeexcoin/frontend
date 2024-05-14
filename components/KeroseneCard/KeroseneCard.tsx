@@ -33,17 +33,19 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
   const stakeHandler = () => console.log("Staked");
   const unstakeHandler = () => console.log("Unstaked");
 
+  const STAKING_CONTRACT =  "0x8e0e695fEC31d5502C2f3E860Fe560Ea80b03E1D"
+
   console.log("staking", StakingAbi.abi);
 
   const amountStaked = useReadContract({
-    address: "0x7363936FC85575Ff59D721B2B0171584880ba55B",
+    address: STAKING_CONTRACT,
     abi: StakingAbi.abi,
     functionName: "balanceOf",
     args: [address],
   })
 
   const earned = useReadContract({
-    address: "0x7363936FC85575Ff59D721B2B0171584880ba55B",
+    address: STAKING_CONTRACT,
     abi: StakingAbi.abi,
     functionName: "earned",
     args: [address],
@@ -77,7 +79,7 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
           <div className="w-[128px]">
             <ButtonComponent onClick={() => writeStake(
               {
-                address: "0x7363936FC85575Ff59D721B2B0171584880ba55B",
+                address: STAKING_CONTRACT,
                 abi: StakingAbi.abi,
                 functionName: "stake",
                 args: [stakeInputValue],
@@ -116,7 +118,7 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
           <div className="w-[128px]">
             <ButtonComponent onClick={() => writeStake(
               {
-                address: "0x7363936FC85575Ff59D721B2B0171584880ba55B",
+                address: STAKING_CONTRACT,
                 abi: StakingAbi.abi,
                 functionName: "withdraw",
                 args: [stakeInputValue],
