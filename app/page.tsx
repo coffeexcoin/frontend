@@ -3,28 +3,29 @@
 import ButtonComponent from "@/components/reusable/ButtonComponent";
 import KeroseneCard from "@/components/KeroseneCard/KeroseneCard";
 import NoteCard from "@/components/NoteCard/NoteCard";
+import {EarnKeroseneContent} from "@/components/earn-kerosene";
 
 import SortbyComponent from "@/components/reusable/SortbyComponent";
-import { SORT_BY_OPTIONS } from "@/mockData/tabsMockData";
-import { useState } from "react";
-import { ClaimModalContent } from "@/components/claim-modal-content";
-import { useQuery } from "@tanstack/react-query";
-import { alchemySdk } from "@/lib/alchemy";
-import { useAccount } from "wagmi";
-import { dNftAddress } from "@/generated";
-import { defaultChain } from "@/lib/config";
-import { SnapshotClaim } from "@/components/NoteCard/Children/SnapshotClaim";
+import {SORT_BY_OPTIONS} from "@/mockData/tabsMockData";
+import {useState} from "react";
+import {ClaimModalContent} from "@/components/claim-modal-content";
+import {useQuery} from "@tanstack/react-query";
+import {alchemySdk} from "@/lib/alchemy";
+import {useAccount} from "wagmi";
+import {dNftAddress} from "@/generated";
+import {defaultChain} from "@/lib/config";
+import {SnapshotClaim} from "@/components/NoteCard/Children/SnapshotClaim";
 import dynamic from "next/dynamic";
 
 const TabsComponent = dynamic(
   () => import("@/components/reusable/TabsComponent"),
-  { ssr: false }
+  {ssr: false}
 );
 
 export default function Home() {
   const [selectedValue, setSelectedValue] = useState("");
-  const { address } = useAccount();
-  const { data: notes } = useQuery({
+  const {address} = useAccount();
+  const {data: notes} = useQuery({
     queryKey: ["notes", address],
     queryFn: () =>
       alchemySdk.nft
@@ -94,7 +95,7 @@ export default function Home() {
     {
       label: "Earn Kerosene",
       tabKey: "earn-kerosene",
-      content: <p>Coming Soon</p>,
+      content: <EarnKeroseneContent />,
     },
     {
       label: "Check Eligibility",
@@ -105,7 +106,7 @@ export default function Home() {
 
   return (
     <div className="flex-1 max-w-screen-md w-[745px] p-4 mt-4">
-      <TabsComponent tabsData={tabsData} urlUpdate/>
+      <TabsComponent tabsData={tabsData} urlUpdate />
     </div>
   );
 }
