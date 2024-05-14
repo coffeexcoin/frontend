@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {useWriteContract} from "wagmi";
+import {useWriteContract, useReadContract, useAccount} from "wagmi";
 import InputComponent from "@/components/reusable/InputComponent";
 import ButtonComponent from "@/components/reusable/ButtonComponent";
 import NoteCardsContainer from "../reusable/NoteCardsContainer";
@@ -18,6 +18,7 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
   staked,
   keroseneEarned,
 }) => {
+  const {address} = useAccount();
   const [stakeInputValue, setStakeInputValue] = useState("");
   const [unstakeInputValue, setUnstakeInputValue] = useState("");
 
@@ -34,15 +35,29 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
 
   console.log("staking", StakingAbi.abi);
 
-  const {writeContract, failureReason} = useWriteContract()
-  console.log("fff", failureReason)
+  const amountStaked = useReadContract({
+    address: "0x7363936FC85575Ff59D721B2B0171584880ba55B",
+    abi: StakingAbi.abi,
+    functionName: "balanceOf",
+    args: [address],
+  })
+
+  const earned = useReadContract({
+    address: "0x7363936FC85575Ff59D721B2B0171584880ba55B",
+    abi: StakingAbi.abi,
+    functionName: "earned",
+    args: [address],
+  })
+
+  const {writeContract: writeStake} = useWriteContract()
+  const {writeContract: writeUnstake} = useWriteContract()
 
   return (
     <NoteCardsContainer>
       <div className="text-sm font-semibold text-[#A1A1AA]">
         <div className="text-2xl text-[#FAFAFA] flex justify-between mt-[15px] w-full">
           <div>{currency}</div>
-          <div>{APY}% APY</div>
+          {/* <div>{APY}% APY</div> */}
         </div>
         <div className="flex justify-between mt-[32px] w-full">
           <div className="w-[380px] ">
@@ -55,12 +70,12 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
             />
           </div>
           <div className="w-[74px]">
-            <ButtonComponent variant="bordered" onClick={onMaxStakeHandler}>
-              Max
-            </ButtonComponent>
+            {/* <ButtonComponent variant="bordered" onClick={onMaxStakeHandler}> */}
+            {/*   Max */}
+            {/* </ButtonComponent> */}
           </div>
           <div className="w-[128px]">
-            <ButtonComponent onClick={() => writeContract(
+            <ButtonComponent onClick={() => writeStake(
               {
                 address: "0x7363936FC85575Ff59D721B2B0171584880ba55B",
                 abi: StakingAbi.abi,
@@ -76,11 +91,11 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
               <strong>{currency}</strong>
               {` Staked:`}
             </div>
-            <div>{staked}</div>
+            <div>{amountStaked.data || 0}</div>
           </div>
           <div className="flex">
             <div className="mr-[5px]">Kerosene earned:</div>
-            <div>{keroseneEarned}</div>
+            <div>{earned.data || 0}</div>
           </div>
         </div>
         <div className="flex justify-between mt-[32px] w-full">
@@ -93,13 +108,20 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
               max={9999999}
             />
           </div>
-          <div className="w-[74px]">
-            <ButtonComponent variant="bordered" onClick={onMaxUnstakeHandler}>
-              Max
-            </ButtonComponent>
-          </div>
+          {/* <div className="w-[74px]"> */}
+          {/*   <ButtonComponent variant="bordered" onClick={onMaxUnstakeHandler}> */}
+          {/*     Max */}
+          {/*   </ButtonComponent> */}
+          {/* </div> */}
           <div className="w-[128px]">
-            <ButtonComponent onClick={unstakeHandler}>Unstake</ButtonComponent>
+            <ButtonComponent onClick={() => writeStake(
+              {
+                address: "0x7363936FC85575Ff59D721B2B0171584880ba55B",
+                abi: StakingAbi.abi,
+                functionName: "withdraw",
+                args: [stakeInputValue],
+              }
+            )}>Unstake</ButtonComponent>
           </div>
         </div>
       </div>
