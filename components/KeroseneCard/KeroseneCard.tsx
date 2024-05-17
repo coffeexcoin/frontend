@@ -17,6 +17,7 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
   APY,
   staked,
   keroseneEarned,
+  kerosenePrice,
 }) => {
   const {address} = useAccount();
   const [stakeInputValue, setStakeInputValue] = useState("");
@@ -30,9 +31,7 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
     setUnstakeInputValue("9999999");
   };
 
-  const stakeHandler = () => console.log("Staked");
-  const unstakeHandler = () => console.log("Unstaked");
-
+  // REFACTOR THIS!
   const STAKING_CONTRACT = "0x8e0e695fEC31d5502C2f3E860Fe560Ea80b03E1D"
 
   console.log("staking", StakingAbi.abi);
@@ -59,7 +58,7 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
       <div className="text-sm font-semibold text-[#A1A1AA]">
         <div className="text-2xl text-[#FAFAFA] flex justify-between mt-[15px] w-full">
           <div>{currency}</div>
-          {/* <div>{APY}% APY</div> */}
+          <div>{kerosenePrice}% APY</div>
         </div>
         <div className="flex justify-between mt-[32px] w-full">
           <div className="w-[380px] ">
@@ -116,7 +115,7 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
           {/*   </ButtonComponent> */}
           {/* </div> */}
           <div className="w-[128px]">
-            <ButtonComponent onClick={() => writeStake(
+            <ButtonComponent onClick={() => writeUnstake(
               {
                 address: STAKING_CONTRACT,
                 abi: StakingAbi.abi,

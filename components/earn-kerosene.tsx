@@ -14,6 +14,7 @@ import {useTransactionStore} from "@/lib/store";
 import ButtonComponent from "@/components/reusable/ButtonComponent";
 import KeroseneCard from "@/components/KeroseneCard/KeroseneCard";
 import StakingAbi from "@/abis/Staking.json";
+import useKerosenePrice from "@/hooks/useKerosenePrice";
 
 export function EarnKeroseneContent() {
   const {address, isConnected} = useAccount();
@@ -40,6 +41,8 @@ export function EarnKeroseneContent() {
 
   const nextNote = parseInt(totalSupply?.toString() || "0", 10);
 
+  const {kerosenePrice} = useKerosenePrice();
+
   const keroseneCardsData = [
     {
       currency: "ETH - DYAD (Uniswap)",
@@ -62,6 +65,7 @@ export function EarnKeroseneContent() {
               staked={card.staked}
               APY={card.APY}
               keroseneEarned={card.keroseneEarned}
+              kerosenePrice={kerosenePrice}
             />
           </div>
         ))}
