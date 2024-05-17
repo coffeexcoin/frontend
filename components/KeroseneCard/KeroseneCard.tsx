@@ -58,7 +58,7 @@ const KeroseneCard: React.FC<KeroseneProps> = ({
       <div className="text-sm font-semibold text-[#A1A1AA]">
         <div className="text-2xl text-[#FAFAFA] flex justify-between mt-[15px] w-full">
           <div>{currency}</div>
-          <div>{kerosenePrice}% APY</div>
+          <div>${kerosenePrice}</div>
         </div>
         <div className="flex justify-between mt-[32px] w-full">
           <div className="w-[380px] ">
