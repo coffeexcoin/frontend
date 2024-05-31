@@ -1,6 +1,6 @@
-import { useAccount } from "wagmi";
-import { formatEther, parseEther } from "viem";
-import { Button } from "@/components/ui/button";
+import {useAccount} from "wagmi";
+import {formatEther, parseEther} from "viem";
+import ButtonComponent from "@/components/reusable/ButtonComponent";
 import {
   dNftAbi,
   dNftAddress,
@@ -9,23 +9,23 @@ import {
   useReadDNftStartPrice,
   useReadDNftTotalSupply,
 } from "@/generated";
-import { defaultChain } from "@/lib/config";
-import { useTransactionStore } from "@/lib/store";
+import {defaultChain} from "@/lib/config";
+import {useTransactionStore} from "@/lib/store";
 
 export function ClaimModalContent() {
-  const { address, isConnected } = useAccount();
-  const { setTransactionData } = useTransactionStore();
+  const {address, isConnected} = useAccount();
+  const {setTransactionData} = useTransactionStore();
 
-  const { data: startingPrice } = useReadDNftStartPrice({
+  const {data: startingPrice} = useReadDNftStartPrice({
     chainId: defaultChain.id,
   });
-  const { data: publicMints } = useReadDNftPublicMints({
+  const {data: publicMints} = useReadDNftPublicMints({
     chainId: defaultChain.id,
   });
-  const { data: priceIncrease } = useReadDNftPriceIncrease({
+  const {data: priceIncrease} = useReadDNftPriceIncrease({
     chainId: defaultChain.id,
   });
-  const { data: totalSupply } = useReadDNftTotalSupply({
+  const {data: totalSupply} = useReadDNftTotalSupply({
     chainId: defaultChain.id,
   });
 
@@ -37,7 +37,7 @@ export function ClaimModalContent() {
 
   if (isConnected) {
     return (
-      <Button
+      <ButtonComponent
         onClick={() => {
           setTransactionData({
             config: {
@@ -52,7 +52,7 @@ export function ClaimModalContent() {
         }}
       >
         Mint Note Nº {nextNote} for {mintPrice} ETH
-      </Button>
+      </ButtonComponent>
     );
   }
 

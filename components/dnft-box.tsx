@@ -4,8 +4,8 @@ import {
   useContractReads,
   useNetwork,
 } from "wagmi";
-import { Abi, getAddress, numberToHex } from "viem";
-import { useMemo, useState } from "react";
+import {Abi, getAddress, numberToHex} from "viem";
+import {useMemo, useState} from "react";
 
 import {
   Select,
@@ -14,30 +14,31 @@ import {
   SelectValue,
   SelectContent,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import ButtonComponent from "@/components/reusable/ButtonComponent";
+import {Button} from "@/components/ui/button";
 import MintAndDepositTab from "@/components/mint-and-deposit-tab";
 import BurnAndWithdrawTab from "@/components/burn-and-withdraw-tab";
-import { MAX_UINT256, deployments } from "@/lib/deployments";
+import {MAX_UINT256, deployments} from "@/lib/deployments";
 import VaultManagerAbi from "@/abis/VaultManager.json";
 import VaultAbi from "@/abis/Vault.json";
 import DyadAbi from "@/abis/Dyad.json";
 import DNftAbi from "@/abis/DNft.json";
 import useModal from "@/contexts/modal";
-import { AddVaultModalContent } from "./add-vault-modal-content";
-import { ClaimModalContent } from "./claim-modal-content";
-import { round } from "../utils/currency";
+import {AddVaultModalContent} from "./add-vault-modal-content";
+import {ClaimModalContent} from "./claim-modal-content";
+import {round} from "../utils/currency";
 
 export default function DnftBox() {
-  const { isConnected, address } = useAccount();
-  const { chain } = useNetwork();
+  const {isConnected, address} = useAccount();
+  const {chain} = useNetwork();
   const [selectedDnft, setSelectedDnft] = useState<string>();
   const [cr, setCr] = useState<string>();
   const [mintedDyad, setMintedDyad] = useState<string>();
   const [usdValue, setUsdValue] = useState<string>();
   const [selectedVault, setSelectedVault] = useState();
-  const { pushModal } = useModal();
+  const {pushModal} = useModal();
 
-  const { vaultManager, dyad, dnft, weth, payments, vaults } = useMemo(
+  const {vaultManager, dyad, dnft, weth, payments, vaults} = useMemo(
     () =>
       chain && deployments[chain.id]
         ? deployments[chain.id]
@@ -45,7 +46,7 @@ export default function DnftBox() {
     [chain]
   );
 
-  const { data: initialContractReads } = useContractReads({
+  const {data: initialContractReads} = useContractReads({
     contracts: [
       {
         address: dnft as `0x${string}`,
@@ -127,7 +128,7 @@ export default function DnftBox() {
   } = initialContractReads ?? {};
 
   // Get addresses of all dnfts owned by user
-  const { data: dnfts } = useContractReads({
+  const {data: dnfts} = useContractReads({
     contracts: Array.apply(null, Array(dnftBalance ?? 0)).map((_, index) => ({
       address: dnft as `0x${string}`,
       abi: DNftAbi as Abi,
