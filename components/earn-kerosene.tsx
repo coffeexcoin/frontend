@@ -1,6 +1,6 @@
-import {useAccount} from "wagmi";
-import {formatEther, parseEther} from "viem";
-import {Button} from "@/components/ui/button";
+import { useAccount } from "wagmi";
+import { formatEther, parseEther } from "viem";
+import { Button } from "@/components/ui/button";
 import {
   dNftAbi,
   dNftAddress,
@@ -9,29 +9,30 @@ import {
   useReadDNftStartPrice,
   useReadDNftTotalSupply,
 } from "@/generated";
-import {defaultChain} from "@/lib/config";
-import {useTransactionStore} from "@/lib/store";
+import { defaultChain } from "@/lib/config";
+import { useTransactionStore } from "@/lib/store";
 import ButtonComponent from "@/components/reusable/ButtonComponent";
 import KeroseneCard from "@/components/KeroseneCard/KeroseneCard";
+import KeroseneCardMerkle from "@/components/KeroseneCard/KeroseneCardMerkle";
 import StakingAbi from "@/abis/Staking.json";
 import useKerosenePrice from "@/hooks/useKerosenePrice";
 
 export function EarnKeroseneContent() {
-  const {address, isConnected} = useAccount();
-  const {setTransactionData} = useTransactionStore();
+  const { address, isConnected } = useAccount();
+  const { setTransactionData } = useTransactionStore();
   console.log("staking", StakingAbi.abi);
 
-  const {data: startingPrice} = useReadDNftStartPrice({
+  const { data: startingPrice } = useReadDNftStartPrice({
     chainId: defaultChain.id,
   });
   console.log("READING", startingPrice);
-  const {data: publicMints} = useReadDNftPublicMints({
+  const { data: publicMints } = useReadDNftPublicMints({
     chainId: defaultChain.id,
   });
-  const {data: priceIncrease} = useReadDNftPriceIncrease({
+  const { data: priceIncrease } = useReadDNftPriceIncrease({
     chainId: defaultChain.id,
   });
-  const {data: totalSupply} = useReadDNftTotalSupply({
+  const { data: totalSupply } = useReadDNftTotalSupply({
     chainId: defaultChain.id,
   });
 
@@ -41,7 +42,7 @@ export function EarnKeroseneContent() {
 
   const nextNote = parseInt(totalSupply?.toString() || "0", 10);
 
-  const {kerosenePrice} = useKerosenePrice();
+  const { kerosenePrice } = useKerosenePrice();
 
   const keroseneCardsData = [
     {
@@ -56,8 +57,9 @@ export function EarnKeroseneContent() {
     return (
       <>
         <div className="mt-12">
-          <ButtonComponent>Claim 1,863 Kerosene</ButtonComponent>
+          <ButtonComponent>Claim Kerosene</ButtonComponent>
         </div>
+        <KeroseneCardMerkle currency="USDC - DYAD" />
         {keroseneCardsData.map((card, index) => (
           <div className="mt-6" key={index}>
             <KeroseneCard
