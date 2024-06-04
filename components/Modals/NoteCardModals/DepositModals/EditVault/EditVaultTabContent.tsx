@@ -39,7 +39,7 @@ const EditVaultTabContent: React.FC<EditVaultTabContentProps> = ({
   const { setTransactionData } = useTransactionStore();
 
   const { data: mintedDyad } = useReadDyadMintedDyad({
-    args: [vaultManagerAddress[defaultChain.id], BigInt(tokenId)],
+    args: [BigInt(tokenId)],
     chainId: defaultChain.id,
   });
 

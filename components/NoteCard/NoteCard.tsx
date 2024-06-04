@@ -30,7 +30,7 @@ function NoteCard({ tokenId }: { tokenId: string }) {
   });
 
   const { data: mintedDyad } = useReadDyadMintedDyad({
-    args: [vaultManagerAddress[defaultChain.id], BigInt(tokenId)],
+    args: [BigInt(tokenId)],
     chainId: defaultChain.id,
   });
 
