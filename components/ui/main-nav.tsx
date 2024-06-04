@@ -31,13 +31,13 @@ export function MainNav({
       </Link>
       <div className="flex text-gray-400 text-xs">
         <div>ETH: $</div>
-        <div>{ethPrice}</div>
+        <div>{ethPrice.toFixed(0)}</div>
       </div>
       <div className="flex text-gray-400 text-xs">
         <div>KEROSENE: $</div>
-        <div>{kerosenePrice.toFixed(4)}</div>
+        <div>{kerosenePrice.toFixed(3)}</div>
         <div className="pl-2"> / DV: $</div>
-        <div>{fromBigNumber(keroseneVaultAssetPrice).toFixed(5)}</div>
+        <div>{fromBigNumber(keroseneVaultAssetPrice).toFixed(2)}</div>
       </div>
       <div className="flex text-gray-400 text-xs"></div>
       {/* <Link */}
