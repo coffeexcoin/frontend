@@ -33,8 +33,8 @@ export default defineConfig({
       name: "Dyad",
       address: {
         // [sepolia.id]: "0xf3b7B1CF5C5f32728D4cBb975c0969C23E70fA81",
-        [sepolia.id]: "0x35C85fbC38c4fBBAb13603d2cce5eC521A022DC4",
-        [mainnet.id]: "0x305B58c5F6B5b6606fb13edD11FbDD5e532d5A26",
+        [sepolia.id]: "0xfd03723a9a3abe0562451496a9a394d2c4bad4ab",
+        [mainnet.id]: "0xfd03723a9a3abe0562451496a9a394d2c4bad4ab",
       },
       abi: dyadAbi,
     },
@@ -42,8 +42,8 @@ export default defineConfig({
       name: "VaultManager",
       address: {
         // [sepolia.id]: "0xDbdF094Aa2d283C6F0044555931C8B50A41e7605",
-        [sepolia.id]: "0x0ceedBf60e5DDa9562B34ac637e60Ac39eEe0213",
-        [mainnet.id]: "0xfaa785c041181a54c700fD993CDdC61dbBfb420f",
+        [sepolia.id]: "0x13421d816572f61048b2c855de88807aec58494b",
+        [mainnet.id]: "0x13421d816572f61048b2c855de88807aec58494b",
       },
       abi: vaultManagerAbi,
     },
@@ -51,15 +51,15 @@ export default defineConfig({
       name: "wETHVault",
       address: {
         // [sepolia.id]: "0xF19c9F99CC04C1C38D51dd3A0c2169D6485762b4",
-        [sepolia.id]: "0x9802741d855b52E22E115B6cE7ba9E0e4433E8A9",
-        [mainnet.id]: "0xcF97cEc1907CcF9d4A0DC4F492A3448eFc744F6c",
+        [sepolia.id]: "0x4fde0131694ae08c549118c595923ce0b42f8299",
+        [mainnet.id]: "0x4fde0131694ae08c549118c595923ce0b42f8299",
       },
       abi: vaultAbi,
     },
     {
       name: "wstETHVault",
       address: {
-        [mainnet.id]: "0x7aE80418051b2897729Cbdf388b07C5158C557A1",
+        [mainnet.id]: "0x7e5f2b8f089a4cd27f5b6b846306020800df45bd",
       },
       abi: vaultAbi,
     },
@@ -119,6 +119,13 @@ export default defineConfig({
       name: "wstETH",
       address: {
         [mainnet.id]: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+      },
+      abi: erc20Abi,
+    },
+    {
+      name: "Kerosene",
+      address: {
+        [mainnet.id]: "0xf3768D6e78E65FC64b8F12ffc824452130BD5394",
       },
       abi: erc20Abi,
     },
