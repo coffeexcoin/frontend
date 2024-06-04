@@ -29,17 +29,17 @@ export function MainNav({
       >
         DYAD
       </Link>
-      <div className="flex text-gray-400 text-sm">
+      <div className="flex text-gray-400 text-xs">
         <div>ETH: $</div>
         <div>{ethPrice}</div>
       </div>
-      <div className="flex text-gray-400 text-sm">
+      <div className="flex text-gray-400 text-xs">
         <div>KEROSENE: $</div>
         <div>{kerosenePrice.toFixed(4)}</div>
         <div className="pl-2"> / DV: $</div>
-        <div>{fromBigNumber(keroseneVaultAssetPrice)}</div>
+        <div>{fromBigNumber(keroseneVaultAssetPrice).toFixed(5)}</div>
       </div>
-      <div className="flex text-gray-400 text-sm"></div>
+      <div className="flex text-gray-400 text-xs"></div>
       {/* <Link */}
       {/*   href="/vaults" */}
       {/*   className="text-sm font-bold text-muted-foreground transition-colors hover:text-primary" */}
