@@ -6,7 +6,7 @@ import TabsComponent from "../reusable/TabsComponent";
 import {
   useReadDyadMintedDyad,
   useReadVaultManagerCollatRatio,
-  useReadVaultManagerGetTotalUsdValue,
+  useReadVaultManagerGetTotalValue,
   useReadVaultManagerMinCollaterizationRatio,
   vaultManagerAbi,
   vaultManagerAddress,
@@ -34,7 +34,7 @@ function NoteCard({ tokenId }: { tokenId: string }) {
     chainId: defaultChain.id,
   });
 
-  const { data: collateralValue } = useReadVaultManagerGetTotalUsdValue({
+  const { data: collateralValue } = useReadVaultManagerGetTotalValue({
     args: [BigInt(tokenId)],
     chainId: defaultChain.id,
   });
@@ -62,10 +62,12 @@ function NoteCard({ tokenId }: { tokenId: string }) {
     allowFailure: false,
   });
 
-  const vaultUsd = vaultCollateral?.map((value, i) => ({
-    value: fromBigNumber(value),
-    label: vaultInfo[i].symbol,
-  })).filter((data) => !!data.value);
+  const vaultUsd = vaultCollateral
+    ?.map((value, i) => ({
+      value: fromBigNumber(value),
+      label: vaultInfo[i].symbol,
+    }))
+    .filter((data) => !!data.value);
 
   const { data: minCollateralizationRatio } =
     useReadVaultManagerMinCollaterizationRatio({ chainId: defaultChain.id });
