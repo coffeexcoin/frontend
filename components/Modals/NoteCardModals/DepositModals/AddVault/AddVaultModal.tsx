@@ -115,7 +115,7 @@ const RowInput = ({
                   functionName: "add",
                   args: [tokenId, vaultAddress],
                 },
-                description: `Add the ${symbol} vault to your Note Nº ${tokenId}`,
+                description: `Enable ${symbol} deposits to Note Nº ${tokenId}`,
               })
             }
           >
