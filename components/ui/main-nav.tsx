@@ -1,15 +1,19 @@
 import Link from "next/link";
 
-import {cn} from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import useEthPrice from "@/hooks/useEthPrice";
 import useKerosenePrice from "@/hooks/useKerosenePrice";
+import { useReadKeroseneVaultAssetPrice } from "@/generated";
+import { fromBigNumber } from "@/lib/utils";
 
 export function MainNav({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
-  const {ethPrice} = useEthPrice();
-  const {kerosenePrice} = useKerosenePrice();
+  const { ethPrice } = useEthPrice();
+  const { kerosenePrice } = useKerosenePrice();
+
+  const { data: keroseneVaultAssetPrice } = useReadKeroseneVaultAssetPrice();
 
   return (
     <nav
@@ -25,18 +29,17 @@ export function MainNav({
       >
         DYAD
       </Link>
-      <div className="flex text-gray-400">
+      <div className="flex text-gray-400 text-sm">
         <div>ETH: $</div>
         <div>{ethPrice}</div>
       </div>
-      <div className="flex text-gray-400">
+      <div className="flex text-gray-400 text-sm">
         <div>KEROSENE: $</div>
         <div>{kerosenePrice.toFixed(4)}</div>
+        <div className="pl-2"> / DV: $</div>
+        <div>{fromBigNumber(keroseneVaultAssetPrice)}</div>
       </div>
-      {/* <div className="flex "> */}
-      {/*   <div>KEROSENE DV: $</div> */}
-      {/*   <div>{ethPrice}</div> */}
-      {/* </div> */}
+      <div className="flex text-gray-400 text-sm"></div>
       {/* <Link */}
       {/*   href="/vaults" */}
       {/*   className="text-sm font-bold text-muted-foreground transition-colors hover:text-primary" */}
