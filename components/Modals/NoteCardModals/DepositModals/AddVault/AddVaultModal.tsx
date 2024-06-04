@@ -10,7 +10,11 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useReadContracts } from "wagmi";
 import { Address } from "viem";
-import { vaultManagerAbi, vaultManagerAddress, wEthVaultAbi } from "@/generated";
+import {
+  vaultManagerAbi,
+  vaultManagerAddress,
+  wEthVaultAbi,
+} from "@/generated";
 import { vaultInfo } from "@/lib/constants";
 import { formatNumber, fromBigNumber } from "@/lib/utils";
 import ButtonComponent from "@/components/reusable/ButtonComponent";

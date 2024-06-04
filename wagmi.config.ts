@@ -1,13 +1,13 @@
-import {defineConfig} from "@wagmi/cli";
-import {react} from "@wagmi/cli/plugins";
-import {mainnet, sepolia} from "viem/chains";
-import {dnftAbi} from "@/lib/abi/Dnft";
-import {licenserAbi} from "@/lib/abi/Licenser";
-import {dyadAbi} from "@/lib/abi/Dyad";
-import {vaultManagerAbi} from "@/lib/abi/VaultManager";
-import {vaultAbi} from "@/lib/abi/Vault";
-import {paymentsAbi} from "@/lib/abi/Payments";
-import {erc20Abi} from "viem";
+import { defineConfig } from "@wagmi/cli";
+import { react } from "@wagmi/cli/plugins";
+import { mainnet, sepolia } from "viem/chains";
+import { dnftAbi } from "@/lib/abi/Dnft";
+import { licenserAbi } from "@/lib/abi/Licenser";
+import { dyadAbi } from "@/lib/abi/Dyad";
+import { vaultManagerAbi } from "@/lib/abi/VaultManager";
+import { vaultAbi } from "@/lib/abi/Vault";
+import { paymentsAbi } from "@/lib/abi/Payments";
+import { erc20Abi } from "viem";
 
 export default defineConfig({
   out: "generated.ts",
@@ -42,8 +42,8 @@ export default defineConfig({
       name: "VaultManager",
       address: {
         // [sepolia.id]: "0xDbdF094Aa2d283C6F0044555931C8B50A41e7605",
-        [sepolia.id]: "0x13421d816572f61048b2c855de88807aec58494b",
-        [mainnet.id]: "0x13421d816572f61048b2c855de88807aec58494b",
+        [sepolia.id]: "0xb62bdb1a6ac97a9b70957dd35357311e8859f0d7",
+        [mainnet.id]: "0xb62bdb1a6ac97a9b70957dd35357311e8859f0d7",
       },
       abi: vaultManagerAbi,
     },
@@ -60,6 +60,13 @@ export default defineConfig({
       name: "wstETHVault",
       address: {
         [mainnet.id]: "0x7e5f2b8f089a4cd27f5b6b846306020800df45bd",
+      },
+      abi: vaultAbi,
+    },
+    {
+      name: "keroseneVault",
+      address: {
+        [mainnet.id]: "0x48600800502a8dc7a2c42f39b21f0326ad67dc4f",
       },
       abi: vaultAbi,
     },
