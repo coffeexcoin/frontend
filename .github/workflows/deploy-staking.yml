@@ -1,0 +1,37 @@
+name: Deploy Staking
+
+on:
+  push:
+    branches:
+      - feat/staking
+
+jobs:
+  site-deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+
+    env:
+      NEXT_PUBLIC_ALCHEMY_API_KEY: "K6mtTYHuGxIcaIPnfj71QjrGAXtHfUIj"
+      NEXT_PUBLIC_SUBGRAPH_URL: "https://api.thegraph.com/subgraphs/name/dyadstablecoin/dnft"
+      NEXT_PUBLIC_WALLETCONNECT_ID: "7d57012cde8b449998792e223c4daebf"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 20.x
+
+      - name: Build
+        run: npx @cloudflare/next-on-pages@1
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          command: pages deploy --project-name=staking .vercel/output/static
