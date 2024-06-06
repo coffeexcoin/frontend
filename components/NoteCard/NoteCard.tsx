@@ -107,7 +107,7 @@ function NoteCard({tokenId}: {tokenId: string}) {
         <NoteNumber
           data={noteData}
           dyad={[
-            parseFloat(fromBigNumber(maxDyad - mintedDyad)),
+            fromBigNumber(maxDyad - BigInt(mintedDyad || 0)),
             fromBigNumber(mintedDyad),
           ]}
           collateral={vaultUsd as any}
