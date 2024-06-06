@@ -80,7 +80,6 @@ function NoteCard({tokenId}: {tokenId: string}) {
   const totalDyad = `${fromBigNumber(mintedDyad)}`;
 
   const maxDyad = (collateralValue || 0n) / (minCollateralizationRatio || 1n);
-  console.log("maxDyad", maxDyad, mintedDyad, parseFloat(fromBigNumber(maxDyad - mintedDyad)))
 
   const noteData: NoteNumberDataColumnModel[] = [
     {
