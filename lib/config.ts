@@ -1,6 +1,6 @@
-import { cookieStorage, createStorage } from "wagmi";
-import { mainnet, sepolia } from "viem/chains";
-import { defaultWagmiConfig } from "@web3modal/wagmi";
+import {cookieStorage, createStorage} from "wagmi";
+import {mainnet, sepolia, anvil} from "viem/chains";
+import {defaultWagmiConfig} from "@web3modal/wagmi";
 
 export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_ID;
 export const defaultChain = mainnet;
