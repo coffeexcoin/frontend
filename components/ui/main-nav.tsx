@@ -33,7 +33,7 @@ export function MainNav({
         <div>ETH: $</div>
         <div>{ethPrice.toFixed(0)}</div>
       </div>
-      <div className="flex text-gray-400 text-xs">
+      <div className="flex text-gray-400 text-xs pl-2">
         <div>KERO: $</div>
         <div>{kerosenePrice.toFixed(3)}</div>
         <div className="pl-2"> / DV: $</div>
