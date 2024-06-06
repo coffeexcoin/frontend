@@ -1,24 +1,24 @@
 import Link from "next/link";
 
-import { cn } from "@/lib/utils";
+import {cn} from "@/lib/utils";
 import useEthPrice from "@/hooks/useEthPrice";
 import useKerosenePrice from "@/hooks/useKerosenePrice";
-import { useReadKeroseneVaultAssetPrice } from "@/generated";
-import { fromBigNumber } from "@/lib/utils";
+import {useReadKeroseneVaultAssetPrice} from "@/generated";
+import {fromBigNumber} from "@/lib/utils";
 
 export function MainNav({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
-  const { ethPrice } = useEthPrice();
-  const { kerosenePrice } = useKerosenePrice();
+  const {ethPrice} = useEthPrice();
+  const {kerosenePrice} = useKerosenePrice();
 
-  const { data: keroseneVaultAssetPrice } = useReadKeroseneVaultAssetPrice();
+  const {data: keroseneVaultAssetPrice} = useReadKeroseneVaultAssetPrice();
 
   return (
     <nav
       className={cn(
-        "flex justify-start items-center space-x-4 lg:space-x-6",
+        "flex justify-start items-center ",
         className
       )}
       {...props}
@@ -29,7 +29,7 @@ export function MainNav({
       >
         DYAD
       </Link>
-      <div className="flex text-gray-400 text-xs">
+      <div className="flex text-gray-400 text-xs pl-4">
         <div>ETH: $</div>
         <div>{ethPrice.toFixed(0)}</div>
       </div>
