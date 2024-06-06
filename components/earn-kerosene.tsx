@@ -68,7 +68,6 @@ export function EarnKeroseneContent() {
       const res = await fetch("https://api.merkl.xyz/v3/campaigns?chainIds=1");
       const data = await res.json();
       const campaign = data["1"]["2_0x8B238f615c1f312D22A65762bCf601a37f1EeEC7"]["0x4f8ccee1c8ce51b094d1f0fc4ac5f02d34c36c659ba62cffb05c86fd727d0350"]
-      console.log("xxxxx", campaign);
       setMerkleData(campaign)
     }
     getMerkl();
@@ -93,7 +92,7 @@ export function EarnKeroseneContent() {
                 <div className="text-2xl text-[#FAFAFA]  ">
                   Step 1
                 </div>
-                <div >Claim a Note or buy on OpenSea</div>
+                <div >Claim a Note or buy on <a href="https://opensea.io/collection/dyad-nft">OpenSea</a></div>
               </div>
               <div className="flex justify-between mt-[32px] w-full">
                 <div className="w-full">
@@ -161,7 +160,7 @@ export function EarnKeroseneContent() {
                       )
                     }
                   >
-                    Stake and Earn on Merkle
+                    Check your earnings on Merkl
                   </ButtonComponent>
                 </div>
               </div>
