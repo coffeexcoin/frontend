@@ -20,8 +20,13 @@ import NoteCardsContainer from "../components/reusable/NoteCardsContainer";
 import {ClaimModalContent} from "./claim-modal-content";
 import {useEffect, useState} from "react";
 
+type MerklData = {
+  apr: number;
+  tvl: number;
+};
+
 export function EarnKeroseneContent() {
-  const [merklData, setMerkleData] = useState("");
+  const [merklData, setMerkleData] = useState<MerklData | undefined>(undefined);
   const {address, isConnected} = useAccount();
   const {setTransactionData} = useTransactionStore();
   console.log("staking", StakingAbi.abi);
@@ -76,7 +81,7 @@ export function EarnKeroseneContent() {
         {merklData && (
           <div className="flex justify-between text-2xl p-[2rem] pl-[5rem] pr-[5rem] font-bold">
             <div>{merklData.apr.toFixed(0)}% APR</div>
-            <div>${merklData.tvl.toFixed(0)} TVL</div>
+            <div>${merklData.tvl.toLocaleString()} TVL</div>
           </div>
         )}
 
