@@ -1,13 +1,13 @@
-import { defineConfig } from "@wagmi/cli";
-import { react } from "@wagmi/cli/plugins";
-import { mainnet, sepolia } from "viem/chains";
-import { dnftAbi } from "@/lib/abi/Dnft";
-import { licenserAbi } from "@/lib/abi/Licenser";
-import { dyadAbi } from "@/lib/abi/Dyad";
-import { vaultManagerAbi } from "@/lib/abi/VaultManager";
-import { vaultAbi } from "@/lib/abi/Vault";
-import { paymentsAbi } from "@/lib/abi/Payments";
-import { erc20Abi } from "viem";
+import {defineConfig} from "@wagmi/cli";
+import {react} from "@wagmi/cli/plugins";
+import {mainnet, sepolia, anvil} from "viem/chains";
+import {dnftAbi} from "@/lib/abi/Dnft";
+import {licenserAbi} from "@/lib/abi/Licenser";
+import {dyadAbi} from "@/lib/abi/Dyad";
+import {vaultManagerAbi} from "@/lib/abi/VaultManager";
+import {vaultAbi} from "@/lib/abi/Vault";
+import {paymentsAbi} from "@/lib/abi/Payments";
+import {erc20Abi} from "viem";
 
 export default defineConfig({
   out: "generated.ts",
@@ -18,6 +18,7 @@ export default defineConfig({
         // [sepolia.id]: "0x07319c8e07847D346051858FD0Ea9b9990E2Df07",
         [sepolia.id]: "0xf799122A38EDadd17BF73433e93Aaa422a515880",
         [mainnet.id]: "0xDc400bBe0B8B79C07A962EA99a642F5819e3b712",
+        [anvil.id]: "0xDc400bBe0B8B79C07A962EA99a642F5819e3b712",
       },
       abi: dnftAbi,
     },
@@ -35,6 +36,7 @@ export default defineConfig({
         // [sepolia.id]: "0xf3b7B1CF5C5f32728D4cBb975c0969C23E70fA81",
         [sepolia.id]: "0xfd03723a9a3abe0562451496a9a394d2c4bad4ab",
         [mainnet.id]: "0xfd03723a9a3abe0562451496a9a394d2c4bad4ab",
+        [anvil.id]: "0xfd03723a9a3abe0562451496a9a394d2c4bad4ab",
       },
       abi: dyadAbi,
     },
@@ -44,6 +46,7 @@ export default defineConfig({
         // [sepolia.id]: "0xDbdF094Aa2d283C6F0044555931C8B50A41e7605",
         [sepolia.id]: "0xb62bdb1a6ac97a9b70957dd35357311e8859f0d7",
         [mainnet.id]: "0xb62bdb1a6ac97a9b70957dd35357311e8859f0d7",
+        [anvil.id]: "0xb62bdb1a6ac97a9b70957dd35357311e8859f0d7",
       },
       abi: vaultManagerAbi,
     },
@@ -53,6 +56,7 @@ export default defineConfig({
         // [sepolia.id]: "0xF19c9F99CC04C1C38D51dd3A0c2169D6485762b4",
         [sepolia.id]: "0x4fde0131694ae08c549118c595923ce0b42f8299",
         [mainnet.id]: "0x4fde0131694ae08c549118c595923ce0b42f8299",
+        [anvil.id]: "0x4fde0131694ae08c549118c595923ce0b42f8299",
       },
       abi: vaultAbi,
     },
@@ -60,6 +64,7 @@ export default defineConfig({
       name: "wstETHVault",
       address: {
         [mainnet.id]: "0x7e5f2b8f089a4cd27f5b6b846306020800df45bd",
+        [anvil.id]: "0x7e5f2b8f089a4cd27f5b6b846306020800df45bd",
       },
       abi: vaultAbi,
     },
@@ -67,6 +72,7 @@ export default defineConfig({
       name: "keroseneVault",
       address: {
         [mainnet.id]: "0x48600800502a8dc7a2c42f39b21f0326ad67dc4f",
+        [anvil.id]: "0x48600800502a8dc7a2c42f39b21f0326ad67dc4f",
       },
       abi: vaultAbi,
     },
@@ -76,6 +82,7 @@ export default defineConfig({
         // [sepolia.id]: "0xe9F9Df2De303802f81EB114a5F24a3d4A17089f4",
         [sepolia.id]: "0xb1dD20c907e1DD95D6c05E29F0d79f6e8061735B",
         [mainnet.id]: "0x7363936FC85575Ff59D721B2B0171584880ba55B",
+        [anvil.id]: "0x7363936FC85575Ff59D721B2B0171584880ba55B",
       },
       abi: paymentsAbi,
     },
@@ -119,6 +126,7 @@ export default defineConfig({
       address: {
         [sepolia.id]: "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
         [mainnet.id]: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        [anvil.id]: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
       },
       abi: erc20Abi,
     },
@@ -126,6 +134,7 @@ export default defineConfig({
       name: "wstETH",
       address: {
         [mainnet.id]: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+        [anvil.id]: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
       },
       abi: erc20Abi,
     },
@@ -133,6 +142,7 @@ export default defineConfig({
       name: "Kerosene",
       address: {
         [mainnet.id]: "0xf3768D6e78E65FC64b8F12ffc824452130BD5394",
+        [anvil.id]: "0xf3768D6e78E65FC64b8F12ffc824452130BD5394",
       },
       abi: erc20Abi,
     },
