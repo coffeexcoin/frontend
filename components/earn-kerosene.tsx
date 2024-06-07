@@ -112,7 +112,9 @@ export function EarnKeroseneContent() {
               </div>
               <div className="flex justify-between mt-[32px] w-full">
                 <div className="w-full">
-                  <ButtonComponent>
+                  <ButtonComponent onClick={() => {
+                    window.open(window.location.origin + "?tab=notes", "_self");
+                  }}>
                     Switch to Manage Notes tab
                   </ButtonComponent>
                 </div>
