@@ -44,9 +44,9 @@ const EditVaultTabContent: React.FC<EditVaultTabContentProps> = ({
   });
 
   const { data: collateralValue } = useReadContract({
-    address: vaultAddress,
-    abi: wEthVaultAbi,
-    functionName: "getUsdValue",
+    address: vaultManagerAddress[defaultChain.id],
+    abi: vaultManagerAbi,
+    functionName: "getTotalValue",
     args: [BigInt(tokenId)],
     chainId: defaultChain.id,
   });

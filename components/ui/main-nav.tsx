@@ -3,7 +3,7 @@ import Link from "next/link";
 import {cn} from "@/lib/utils";
 import useEthPrice from "@/hooks/useEthPrice";
 import useKerosenePrice from "@/hooks/useKerosenePrice";
-import {useReadKeroseneVaultAssetPrice} from "@/generated";
+import {useReadKeroseneVaultV2AssetPrice} from "@/generated";
 import {fromBigNumber} from "@/lib/utils";
 
 export function MainNav({
@@ -13,7 +13,7 @@ export function MainNav({
   const {ethPrice} = useEthPrice();
   const {kerosenePrice} = useKerosenePrice();
 
-  const {data: keroseneVaultAssetPrice} = useReadKeroseneVaultAssetPrice();
+  const {data: keroseneVaultAssetPrice} = useReadKeroseneVaultV2AssetPrice();
 
   return (
     <nav
@@ -37,7 +37,7 @@ export function MainNav({
         <div>KERO: $</div>
         <div>{kerosenePrice.toFixed(3)}</div>
         <div className="pl-2"> / DV: $</div>
-        <div>{fromBigNumber(keroseneVaultAssetPrice)}</div>
+        <div>{fromBigNumber(keroseneVaultAssetPrice, 8).toFixed(4)}</div>
       </div>
       <div className="flex text-gray-400 text-xs"></div>
       {/* <Link */}
