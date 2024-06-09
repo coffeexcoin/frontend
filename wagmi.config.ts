@@ -77,6 +77,14 @@ export default defineConfig({
       abi: vaultAbi,
     },
     {
+      name: "keroseneVaultV2",
+      address: {
+        [mainnet.id]: "0x4808e4CC6a2Ba764778A0351E1Be198494aF0b43",
+        [anvil.id]: "0x4808e4CC6a2Ba764778A0351E1Be198494aF0b43",
+      },
+      abi: vaultAbi,
+    },
+    {
       name: "Payments",
       address: {
         // [sepolia.id]: "0xe9F9Df2De303802f81EB114a5F24a3d4A17089f4",

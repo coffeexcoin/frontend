@@ -5,8 +5,9 @@ import {
   wstEthVaultAddress,
   keroseneAddress,
   keroseneVaultAddress,
+  keroseneVaultV2Address,
 } from "@/generated";
-import { defaultChain } from "@/lib/config";
+import {defaultChain} from "@/lib/config";
 
 export const vaultInfo = [
   {
@@ -21,7 +22,12 @@ export const vaultInfo = [
   },
   {
     vaultAddress: keroseneVaultAddress[defaultChain.id],
-    symbol: "KEROSENE",
+    symbol: "KEROSENE - OLD",
+    tokenAddress: keroseneAddress[defaultChain.id],
+  },
+  {
+    vaultAddress: keroseneVaultV2Address[defaultChain.id],
+    symbol: "KEROSENE - NEW",
     tokenAddress: keroseneAddress[defaultChain.id],
   },
 ];
