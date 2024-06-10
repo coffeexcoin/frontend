@@ -133,7 +133,7 @@ const EditVaultTabContent: React.FC<EditVaultTabContentProps> = ({
       )}
 
       <div className="flex gap-8">
-        {allowance !== undefined && allowance <= toBigNumber(inputValue) && action === "deposit" ? (
+        {allowance !== undefined && allowance < toBigNumber(inputValue, 0) && action === "deposit" ? (
           <div className="w-[100px]">
             <ButtonComponent
               onClick={() =>
