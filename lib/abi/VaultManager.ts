@@ -125,7 +125,7 @@ export const vaultManagerAbi = [
   },
   {
     inputs: [],
-    name: "MIN_COLLATERIZATION_RATIO",
+    name: "MIN_COLLAT_RATIO",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",

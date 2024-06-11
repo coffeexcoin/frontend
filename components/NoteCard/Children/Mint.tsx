@@ -7,7 +7,7 @@ import { useTransactionStore } from "@/lib/store";
 import {
   useReadDyadMintedDyad,
   useReadVaultManagerGetTotalValue,
-  useReadVaultManagerMinCollaterizationRatio,
+  useReadVaultManagerMinCollatRatio,
   vaultManagerAbi,
   vaultManagerAddress,
 } from "@/generated";
@@ -38,7 +38,7 @@ const Mint: React.FC<MintProps> = ({ dyadMinted, currentCr, tokenId }) => {
   });
 
   const { data: minCollateralizationRatio } =
-    useReadVaultManagerMinCollaterizationRatio({ chainId: defaultChain.id });
+    useReadVaultManagerMinCollatRatio({ chainId: defaultChain.id });
 
   const newCr =
     (mintedDyad || 0n) +
