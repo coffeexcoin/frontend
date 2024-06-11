@@ -7,7 +7,7 @@ import {
   useReadDyadMintedDyad,
   useReadVaultManagerCollatRatio,
   useReadVaultManagerGetTotalValue,
-  useReadVaultManagerMinCollaterizationRatio,
+  useReadVaultManagerMinCollatRatio,
   vaultManagerAbi,
   vaultManagerAddress,
   wEthVaultAbi,
@@ -70,7 +70,7 @@ function NoteCard({tokenId}: {tokenId: string}) {
     .filter((data) => !!data.value);
 
   const {data: minCollateralizationRatio} =
-    useReadVaultManagerMinCollaterizationRatio({chainId: defaultChain.id});
+    useReadVaultManagerMinCollatRatio({chainId: defaultChain.id});
 
   const totalCollateral = `$${formatNumber(fromBigNumber(collateralValue))}`;
   const collateralizationRatio =
