@@ -1,9 +1,9 @@
 import ButtonComponent from "@/components/reusable/ButtonComponent";
-import { Input } from "@/components/ui/input";
+import {Input} from "@/components/ui/input";
 import claimData from "@/lib/snapshot-data.json";
-import { formatNumber } from "@/lib/utils";
-import { useState } from "react";
-import { isAddress } from "viem";
+import {formatNumber} from "@/lib/utils";
+import {useState} from "react";
+import {isAddress} from "viem";
 
 export const SnapshotClaim = () => {
   const [address, setAddress] = useState("");
@@ -43,11 +43,16 @@ export const SnapshotClaim = () => {
         <div className="flex gap-8 items-center">
           <p>Address: {address}</p>
           {claimAmount > 0 ? (
-            <p className="text-green-500">{formatNumber(claimAmount, 0)} Kerosene</p>
+            <div>
+              <p className="text-green-500">{formatNumber(claimAmount, 0)} Kerosene</p>
+            </div>
           ) : (
             <p className="text-red-500">Not Eligible</p>
           )}
         </div>
+      )}
+      {claimAmount > 0 && (
+        <ButtonComponent onClick={() => window.open("dyadairdrop.xyz")}>Claim</ButtonComponent>
       )}
     </div>
   );
