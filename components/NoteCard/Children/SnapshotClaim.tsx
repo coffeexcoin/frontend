@@ -8,7 +8,7 @@ import { defaultChain } from "@/lib/config";
 import claimData from "@/lib/snapshot-data.json";
 import MerkleTree from "merkletreejs";
 import { useMemo } from "react";
-import { encodePacked, getAddress, keccak256, parseEther } from "viem";
+import { encodePacked, formatEther, getAddress, keccak256, parseEther } from "viem";
 import { useAccount } from "wagmi";
 
 export const SnapshotClaim = () => {
@@ -70,11 +70,11 @@ export const SnapshotClaim = () => {
 
       {hasClaimed ? (
         <p className="text-green-500">
-          Claimed {claimAmount.toString()} KEROSENE
+          Claimed {formatEther(claimAmount)} KEROSENE
         </p>
       ) : claimAmount > 0 ? (
         <>
-          <p>Eligible for {claimAmount.toString()} KEROSENE</p>
+          <p>Eligible for {formatEther(claimAmount)} KEROSENE</p>
           <ButtonComponent
             onClick={() => {
               writeContract(merkleClaimConfig!.request);
