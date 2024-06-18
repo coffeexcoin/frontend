@@ -1,5 +1,4 @@
 import ButtonComponent from "@/components/reusable/ButtonComponent";
-import { Input } from "@/components/ui/input";
 import {
   useReadMerkleClaimErc20HasClaimed,
   useSimulateMerkleClaimErc20Claim,
@@ -7,17 +6,13 @@ import {
 } from "@/generated";
 import { defaultChain } from "@/lib/config";
 import claimData from "@/lib/snapshot-data.json";
-import { formatNumber } from "@/lib/utils";
 import MerkleTree from "merkletreejs";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
-  encodeAbiParameters,
   encodePacked,
   getAddress,
-  isAddress,
   keccak256,
   parseEther,
-  toBytes,
   zeroAddress,
 } from "viem";
 import { useAccount } from "wagmi";
