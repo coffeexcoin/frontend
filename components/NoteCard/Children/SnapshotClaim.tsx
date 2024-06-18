@@ -6,7 +6,6 @@ import {
 } from "@/generated";
 import { defaultChain } from "@/lib/config";
 import claimData from "@/lib/snapshot-data.json";
-import { toBigNumber } from "@/lib/utils";
 import MerkleTree from "merkletreejs";
 import { useMemo } from "react";
 import {
@@ -42,7 +41,7 @@ export const SnapshotClaim = () => {
     const data = claimData.find(
       (data) => data.address.toLowerCase() === address?.toLowerCase()
     );
-    return toBigNumber(data?.amount || 0);
+    return parseEther(data?.amount || "0");
   }, [address]);
 
   const { data: hasClaimed } = useReadMerkleClaimErc20HasClaimed({
