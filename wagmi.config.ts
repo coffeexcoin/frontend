@@ -7,11 +7,20 @@ import {dyadAbi} from "@/lib/abi/Dyad";
 import {vaultManagerAbi} from "@/lib/abi/VaultManager";
 import {vaultAbi} from "@/lib/abi/Vault";
 import {paymentsAbi} from "@/lib/abi/Payments";
+import {merkleClaimAbi} from "@/lib/abi/MerkleClaim";
 import {erc20Abi} from "viem";
 
 export default defineConfig({
   out: "generated.ts",
   contracts: [
+    {
+      name: "MerkleClaimERC20",
+      address: {
+        [mainnet.id]: "0xA7573209bD3c3b1a3590Fd44F33ED9fE721ae4C2",
+        [anvil.id]: "0xA7573209bD3c3b1a3590Fd44F33ED9fE721ae4C2",
+      },
+      abi: merkleClaimAbi
+    },
     {
       name: "DNft",
       address: {
