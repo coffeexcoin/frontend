@@ -8,28 +8,22 @@ import { defaultChain } from "@/lib/config";
 import claimData from "@/lib/snapshot-data.json";
 import MerkleTree from "merkletreejs";
 import { useMemo } from "react";
-import {
-  encodePacked,
-  getAddress,
-  keccak256,
-  parseEther,
-} from "viem";
+import { encodePacked, getAddress, keccak256, parseEther } from "viem";
 import { useAccount } from "wagmi";
 
 export const SnapshotClaim = () => {
   const getLeaf = (address: string, amount: bigint) =>
     Buffer.from(
       keccak256(
-        encodePacked(
-          ["address", "uint256"],
-          [getAddress(address), amount]
-        )
+        encodePacked(["address", "uint256"], [getAddress(address), amount])
       ).slice(2),
       "hex"
     );
 
   const tree = useMemo(() => {
-    const leaves = claimData.map((data) => getLeaf(data.address, parseEther(data.amount)));
+    const leaves = claimData.map((data) =>
+      getLeaf(data.address, parseEther(data.amount))
+    );
     const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
 
     return tree;
