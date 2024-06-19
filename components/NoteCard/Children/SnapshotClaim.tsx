@@ -1,58 +1,90 @@
 import ButtonComponent from "@/components/reusable/ButtonComponent";
-import {Input} from "@/components/ui/input";
+import {
+  useReadMerkleClaimErc20HasClaimed,
+  useSimulateMerkleClaimErc20Claim,
+  useWriteMerkleClaimErc20Claim,
+} from "@/generated";
+import { defaultChain } from "@/lib/config";
 import claimData from "@/lib/snapshot-data.json";
-import {formatNumber} from "@/lib/utils";
-import {useState} from "react";
-import {isAddress} from "viem";
+import MerkleTree from "merkletreejs";
+import { useMemo } from "react";
+import { encodePacked, formatEther, getAddress, keccak256, parseEther } from "viem";
+import { useAccount } from "wagmi";
 
 export const SnapshotClaim = () => {
-  const [address, setAddress] = useState("");
-  const [claimAmount, setClaimAmount] = useState(0);
-  const [buttonClicked, setButtonClicked] = useState(false);
-  const [invalidAddress, setInvalidAddress] = useState(false);
+  const getLeaf = (address: string, amount: bigint) =>
+    Buffer.from(
+      keccak256(
+        encodePacked(["address", "uint256"], [getAddress(address), amount])
+      ).slice(2),
+      "hex"
+    );
 
-  const handleCheck = () => {
-    if (isAddress(address)) {
-      setInvalidAddress(false);
-      const data = claimData.find((data) => data.address.toLowerCase() === address.toLowerCase());
-      setButtonClicked(true);
-      setClaimAmount(data?.amount || 0);
-    } else {
-      setInvalidAddress(true);
-    }
-  };
+  const tree = useMemo(() => {
+    const leaves = claimData.map((data) =>
+      getLeaf(data.address, parseEther(data.amount))
+    );
+    const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
+
+    return tree;
+  }, []);
+
+  const { address } = useAccount();
+
+  const claimAmount = useMemo(() => {
+    const data = claimData.find(
+      (data) => data.address.toLowerCase() === address?.toLowerCase()
+    );
+    return parseEther(data?.amount || "0");
+  }, [address]);
+
+  const { data: hasClaimed } = useReadMerkleClaimErc20HasClaimed({
+    args: [address!],
+    chainId: defaultChain.id,
+    query: {
+      enabled: !!address,
+    },
+  });
+
+  const proof = useMemo(() => {
+    if (!address) return [];
+
+    return tree
+      .getHexProof(getLeaf(address, claimAmount))
+      .map((p) => p as `0x${string}`);
+  }, [address, claimAmount, tree]);
+
+  const { data: merkleClaimConfig, error } = useSimulateMerkleClaimErc20Claim({
+    query: {
+      enabled: !!address && !hasClaimed,
+    },
+    args: [address!, claimAmount, proof],
+  });
+
+  const { writeContract } = useWriteMerkleClaimErc20Claim();
 
   return (
     <div className="flex flex-col bg-[#1A1A1A] gap-4 p-7 rounded-[10px] mt-5">
-      <div className="flex justify-between items-center gap-6">
-        <Input
-          value={address}
-          onChange={(e) => {
-            setAddress(e.target.value);
-            setButtonClicked(false);
-            setInvalidAddress(false);
-          }}
-          placeholder="Enter address to check eligibility..."
-        />
-        <div className="w-[200px]">
-          <ButtonComponent onClick={handleCheck}>Check</ButtonComponent>
-        </div>
-      </div>
-      {invalidAddress && <p className="text-red-500">Invalid Address</p>}
-      {buttonClicked && (
-        <div className="flex gap-8 items-center">
-          <p>Address: {address}</p>
-          {claimAmount > 0 ? (
-            <div>
-              <p className="text-green-500">{formatNumber(claimAmount, 0)} Kerosene</p>
-            </div>
-          ) : (
-            <p className="text-red-500">Not Eligible</p>
-          )}
-        </div>
-      )}
-      {claimAmount > 0 && (
-        <ButtonComponent onClick={() => window.open("dyadairdrop.xyz")}>Claim</ButtonComponent>
+      {!address && <p>Connect your wallet to claim KEROSENE</p>}
+      {!hasClaimed && error && <p className="text-red-500">{error.message}</p>}
+
+      {hasClaimed ? (
+        <p className="text-green-500">
+          Claimed {formatEther(claimAmount)} KEROSENE
+        </p>
+      ) : claimAmount > 0 ? (
+        <>
+          <p>Eligible for {formatEther(claimAmount)} KEROSENE</p>
+          <ButtonComponent
+            onClick={() => {
+              writeContract(merkleClaimConfig!.request);
+            }}
+          >
+            Claim
+          </ButtonComponent>
+        </>
+      ) : (
+        <p>Not eligible for any KEROSENE</p>
       )}
     </div>
   );
