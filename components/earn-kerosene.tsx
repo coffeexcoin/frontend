@@ -1,6 +1,6 @@
-import {useAccount} from "wagmi";
-import {formatEther, parseEther} from "viem";
-import {Button} from "@/components/ui/button";
+import { useAccount } from "wagmi";
+import { formatEther, parseEther } from "viem";
+import { Button } from "@/components/ui/button";
 import {
   dNftAbi,
   dNftAddress,
@@ -9,16 +9,16 @@ import {
   useReadDNftStartPrice,
   useReadDNftTotalSupply,
 } from "@/generated";
-import {defaultChain} from "@/lib/config";
-import {useTransactionStore} from "@/lib/store";
+import { defaultChain } from "@/lib/config";
+import { useTransactionStore } from "@/lib/store";
 import ButtonComponent from "@/components/reusable/ButtonComponent";
 import KeroseneCard from "@/components/KeroseneCard/KeroseneCard";
 import KeroseneCardMerkle from "@/components/KeroseneCard/KeroseneCardMerkle";
 import StakingAbi from "@/abis/Staking.json";
 import useKerosenePrice from "@/hooks/useKerosenePrice";
 import NoteCardsContainer from "../components/reusable/NoteCardsContainer";
-import {ClaimModalContent} from "./claim-modal-content";
-import {useEffect, useState} from "react";
+import { ClaimModalContent } from "./claim-modal-content";
+import { useEffect, useState } from "react";
 
 type MerklData = {
   apr: number;
@@ -27,21 +27,21 @@ type MerklData = {
 
 export function EarnKeroseneContent() {
   const [merklData, setMerkleData] = useState<MerklData | undefined>(undefined);
-  const {address, isConnected} = useAccount();
-  const {setTransactionData} = useTransactionStore();
+  const { address, isConnected } = useAccount();
+  const { setTransactionData } = useTransactionStore();
   console.log("staking", StakingAbi.abi);
 
-  const {data: startingPrice} = useReadDNftStartPrice({
+  const { data: startingPrice } = useReadDNftStartPrice({
     chainId: defaultChain.id,
   });
   console.log("READING", startingPrice);
-  const {data: publicMints} = useReadDNftPublicMints({
+  const { data: publicMints } = useReadDNftPublicMints({
     chainId: defaultChain.id,
   });
-  const {data: priceIncrease} = useReadDNftPriceIncrease({
+  const { data: priceIncrease } = useReadDNftPriceIncrease({
     chainId: defaultChain.id,
   });
-  const {data: totalSupply} = useReadDNftTotalSupply({
+  const { data: totalSupply } = useReadDNftTotalSupply({
     chainId: defaultChain.id,
   });
 
@@ -51,7 +51,7 @@ export function EarnKeroseneContent() {
 
   const nextNote = parseInt(totalSupply?.toString() || "0", 10);
 
-  const {kerosenePrice} = useKerosenePrice();
+  const { kerosenePrice } = useKerosenePrice();
 
   const keroseneCardsData = [
     {
@@ -64,15 +64,16 @@ export function EarnKeroseneContent() {
 
   useEffect(() => {
     async function getMerkl() {
-
       const res = await fetch("https://api.merkl.xyz/v3/campaigns?chainIds=1");
       const data = await res.json();
-      const campaign = data["1"]["2_0x8B238f615c1f312D22A65762bCf601a37f1EeEC7"]["0x6c675a36e234aa898c79e41a5ed9faf6cb79bc974ef25053066a42b521186bf3"]
-      setMerkleData(campaign)
+      const campaign =
+        data["1"]["2_0x8B238f615c1f312D22A65762bCf601a37f1EeEC7"][
+          "0x3a0c7f275e6af9d9705ca0bc9a84a2c28ba0421acab059deb9d77e156995bb96"
+        ];
+      setMerkleData(campaign);
     }
     getMerkl();
-  }, [])
-
+  }, []);
 
   return (
     <div>
@@ -87,11 +88,11 @@ export function EarnKeroseneContent() {
         <NoteCardsContainer>
           <div className="text-sm font-semibold text-[#A1A1AA]">
             <div className="flex w-full flex justify-between items-center">
-
-              <div className="text-2xl text-[#FAFAFA]  ">
-                Step 1
+              <div className="text-2xl text-[#FAFAFA]  ">Step 1</div>
+              <div>
+                Claim a Note or buy on{" "}
+                <a href="https://opensea.io/collection/dyad-nft">OpenSea</a>
               </div>
-              <div >Claim a Note or buy on <a href="https://opensea.io/collection/dyad-nft">OpenSea</a></div>
             </div>
             <div className="flex justify-between mt-[32px] w-full">
               <div className="w-full">
@@ -103,17 +104,16 @@ export function EarnKeroseneContent() {
         <NoteCardsContainer>
           <div className="text-sm font-semibold text-[#A1A1AA]">
             <div className="flex w-full flex justify-between items-center">
-
-              <div className="text-2xl text-[#FAFAFA]  ">
-                Step 2
-              </div>
-              <div >Deposit wETH and/or wstETH and mint DYAD</div>
+              <div className="text-2xl text-[#FAFAFA]  ">Step 2</div>
+              <div>Deposit wETH and/or wstETH and mint DYAD</div>
             </div>
             <div className="flex justify-between mt-[32px] w-full">
               <div className="w-full">
-                <ButtonComponent onClick={() => {
-                  window.open(window.location.origin + "?tab=notes", "_self");
-                }}>
+                <ButtonComponent
+                  onClick={() => {
+                    window.open(window.location.origin + "?tab=notes", "_self");
+                  }}
+                >
                   Switch to Manage Notes tab
                 </ButtonComponent>
               </div>
@@ -123,11 +123,8 @@ export function EarnKeroseneContent() {
         <NoteCardsContainer>
           <div className="text-sm font-semibold text-[#A1A1AA]">
             <div className="flex w-full flex justify-between items-center">
-
-              <div className="text-2xl text-[#FAFAFA]  ">
-                Step 3
-              </div>
-              <div >Provide liquidity to USDC - DYAD on Uniswap v3</div>
+              <div className="text-2xl text-[#FAFAFA]  ">Step 3</div>
+              <div>Provide liquidity to USDC - DYAD on Uniswap v3</div>
             </div>
             <div className="flex justify-between mt-[32px] w-full">
               <div className="w-full">
@@ -147,7 +144,6 @@ export function EarnKeroseneContent() {
         <NoteCardsContainer>
           <div className="text-sm font-semibold text-[#A1A1AA]">
             <div className="flex w-full flex justify-between items-center">
-
               <div className="text-2xl text-[#FAFAFA]  ">
                 That's it. No staking necessary.
               </div>
@@ -170,5 +166,4 @@ export function EarnKeroseneContent() {
       </div>
     </div>
   );
-
 }
