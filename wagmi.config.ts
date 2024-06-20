@@ -9,10 +9,18 @@ import { vaultAbi } from "@/lib/abi/Vault";
 import { paymentsAbi } from "@/lib/abi/Payments";
 import { merkleClaimAbi } from "@/lib/abi/MerkleClaim";
 import { erc20Abi } from "viem";
+import { angleDistributorAbi } from "./lib/abi/AngleDistributor";
 
 export default defineConfig({
   out: "generated.ts",
   contracts: [
+    {
+      name: "Distributor",
+      address: {
+        [mainnet.id]: "0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae",
+      },
+      abi: angleDistributorAbi,
+    },
     {
       name: "MerkleClaimERC20",
       address: {
