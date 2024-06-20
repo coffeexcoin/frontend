@@ -2,7 +2,7 @@ import ButtonComponent from "@/components/reusable/ButtonComponent";
 import NoteCardsContainer from "../components/reusable/NoteCardsContainer";
 import { ClaimModalContent } from "./claim-modal-content";
 import { useMerklCampaign } from "@/hooks/useMerklCampaign";
-import { useAccount } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { useMerklRewards } from "@/hooks/useMerklRewards";
 import { formatEther } from "viem";
 import {
@@ -12,7 +12,7 @@ import {
 } from "@/generated";
 import { defaultChain } from "@/lib/config";
 import useKerosenePrice from "@/hooks/useKerosenePrice";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 export function EarnKeroseneContent() {
   const { address } = useAccount();
@@ -22,20 +22,21 @@ export function EarnKeroseneContent() {
     address,
   });
 
-  const { data: claimMerklRewardsConfig } = useSimulateDistributorClaim({
-    args: [
-      [address!],
-      [keroseneAddress[defaultChain.id]],
-      [merklRewards?.accumulated || 0n],
-      [merklRewards?.proof || []],
-    ],
-    query: {
-      enabled:
-        address !== undefined &&
-        merklRewards !== undefined &&
-        merklRewards.accumulated > 0n,
-    },
-  });
+  const { data: claimMerklRewardsConfig, error: claimError } =
+    useSimulateDistributorClaim({
+      args: [
+        [address!],
+        [keroseneAddress[defaultChain.id]],
+        [merklRewards?.accumulated || 0n],
+        [merklRewards?.proof || []],
+      ],
+      query: {
+        enabled:
+          address !== undefined &&
+          merklRewards !== undefined &&
+          merklRewards.accumulated > 0n,
+      },
+    });
 
   const { kerosenePrice } = useKerosenePrice();
 
@@ -58,8 +59,22 @@ export function EarnKeroseneContent() {
     };
   }, [merklRewards, kerosenePrice]);
 
-  const { writeContract: claimMerklRewards, error: claimError } =
-    useWriteDistributorClaim();
+  const {
+    writeContract: claimMerklRewards,
+    data: claimTransactionHash,
+    isPending: writingClaim,
+  } = useWriteDistributorClaim();
+
+  const { data: claimTransaction, isPending: transactionPending } =
+    useWaitForTransactionReceipt({
+      hash: claimTransactionHash,
+    });
+
+  useEffect(() => {
+    if (!!address && claimTransaction?.status === "success") {
+      refetch(address);
+    }
+  });
 
   return (
     <div>
@@ -81,8 +96,15 @@ export function EarnKeroseneContent() {
               </div>
             </div>
             <div className="flex justify-between mt-[32px] w-full">
-              <div className="w-full">
+              <div className="w-full flex gap-4">
                 <ClaimModalContent />
+                <ButtonComponent
+                  onClick={() => {
+                    window.open("https://opensea.io/collection/dyad-nft");
+                  }}
+                >
+                  Buy on OpenSea
+                </ButtonComponent>
               </div>
             </div>
           </div>
@@ -91,7 +113,7 @@ export function EarnKeroseneContent() {
           <div className="text-sm font-semibold text-[#A1A1AA]">
             <div className="flex w-full flex justify-between items-center">
               <div className="text-2xl text-[#FAFAFA]  ">Step 2</div>
-              <div>Deposit wETH and/or wstETH and mint DYAD</div>
+              <div>Deposit collateral and mint DYAD</div>
             </div>
             <div className="flex justify-between mt-[32px] w-full">
               <div className="w-full">
@@ -130,9 +152,8 @@ export function EarnKeroseneContent() {
         <NoteCardsContainer>
           <div className="text-sm font-semibold text-[#A1A1AA]">
             <div className="flex w-full flex justify-between items-center">
-              <div className="text-2xl text-[#FAFAFA]  ">
-                Step 4: Claim Rewards
-              </div>
+              <div className="text-2xl text-[#FAFAFA]  ">Step 4</div>
+              <div>Claim rewards from Merkl</div>
             </div>
 
             <div className="flex flex-col gap-4 justify-between mt-[32px] w-full">
@@ -141,9 +162,7 @@ export function EarnKeroseneContent() {
                   <p>Connect Wallet to see rewards or</p>
                   <ButtonComponent
                     onClick={() =>
-                      window.open(
-                        "https://merkl.angle.money/user/"
-                      )
+                      window.open("https://merkl.angle.money/user/")
                     }
                   >
                     Check your earnings on Merkl
@@ -155,7 +174,7 @@ export function EarnKeroseneContent() {
                     {loading ? (
                       <p>Loading...</p>
                     ) : error ? (
-                      <p className="grid-span-3">{error}</p>
+                      <p className="col-span-3">{error}</p>
                     ) : (
                       <>
                         <p>Your total earnings</p>
@@ -178,16 +197,34 @@ export function EarnKeroseneContent() {
                     )}
                   </div>
                   {merklRewards &&
-                    merklRewards.unclaimed > 0n &&
                     claimMerklRewardsConfig != undefined &&
                     claimError === null && (
-                      <div className="w-full">
+                      <div className="w-full flex gap-4">
                         <ButtonComponent
+                          disabled={
+                            merklRewards.unclaimed === 0n ||
+                            writingClaim ||
+                            (claimTransactionHash && transactionPending)
+                          }
                           onClick={() => {
                             claimMerklRewards(claimMerklRewardsConfig.request);
                           }}
                         >
-                          Claim
+                          {merklRewards.unclaimed === 0n
+                            ? "Nothing to claim"
+                            : writingClaim ||
+                                (claimTransactionHash && transactionPending)
+                              ? "Claiming..."
+                              : "Claim"}
+                        </ButtonComponent>
+                        <ButtonComponent
+                          onClick={() => {
+                            window.open(
+                              `https://merkl.angle.money/ethereum/pool/0x8B238f615c1f312D22A65762bCf601a37f1EeEC7?campaignId=${merklData?.campaignId}`
+                            );
+                          }}
+                        >
+                          View campaign on Merkl
                         </ButtonComponent>
                       </div>
                     )}

@@ -17,13 +17,14 @@ export const useMerklRewards = ({ address }: { address: `0x${string}` | undefine
     const [error, setError] = useState<string | undefined>(undefined);
 
     const getMerklRewards = useCallback(async (address: `0x${string}`) => {
-
+        setLoading(true);
         try {
             const res = await fetch(`https://api.merkl.xyz/v3/rewards?user=${address}&chainIds=1`);
             const data = await res.json()
 
             const rewards = data["1"].tokenData[keroseneAddress[defaultChain.id]];
 
+            console.log(rewards)
             if (rewards) {
                 setMerklRewards({
                     accumulated: BigInt(rewards.accumulated),
@@ -36,7 +37,7 @@ export const useMerklRewards = ({ address }: { address: `0x${string}` | undefine
             setError("Error fetching rewards. Please try again later.")
         }
         setLoading(false)
-    }, [setMerklRewards])
+    }, [setLoading, setError, setMerklRewards])
 
     useEffect(() => {
         if (address) {
