@@ -6,8 +6,10 @@ import {
   keroseneAddress,
   keroseneVaultAddress,
   keroseneVaultV2Address,
+  tBtcVaultAddress,
+  tBtcAddress,
 } from "@/generated";
-import {defaultChain} from "@/lib/config";
+import { defaultChain } from "@/lib/config";
 
 export const vaultInfo = [
   {
@@ -21,13 +23,13 @@ export const vaultInfo = [
     tokenAddress: wstEthAddress[defaultChain.id],
   },
   {
-    vaultAddress: keroseneVaultAddress[defaultChain.id],
-    symbol: "KEROSENE - OLD",
+    vaultAddress: keroseneVaultV2Address[defaultChain.id],
+    symbol: "KEROSENE",
     tokenAddress: keroseneAddress[defaultChain.id],
   },
   {
-    vaultAddress: keroseneVaultV2Address[defaultChain.id],
-    symbol: "KEROSENE - NEW",
-    tokenAddress: keroseneAddress[defaultChain.id],
+    vaultAddress: tBtcVaultAddress[defaultChain.id],
+    symbol: "tBTC",
+    tokenAddress: tBtcAddress[defaultChain.id],
   },
 ];

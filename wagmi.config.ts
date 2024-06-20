@@ -1,14 +1,14 @@
-import {defineConfig} from "@wagmi/cli";
-import {react} from "@wagmi/cli/plugins";
-import {mainnet, sepolia, anvil} from "viem/chains";
-import {dnftAbi} from "@/lib/abi/Dnft";
-import {licenserAbi} from "@/lib/abi/Licenser";
-import {dyadAbi} from "@/lib/abi/Dyad";
-import {vaultManagerAbi} from "@/lib/abi/VaultManager";
-import {vaultAbi} from "@/lib/abi/Vault";
-import {paymentsAbi} from "@/lib/abi/Payments";
-import {merkleClaimAbi} from "@/lib/abi/MerkleClaim";
-import {erc20Abi} from "viem";
+import { defineConfig } from "@wagmi/cli";
+import { react } from "@wagmi/cli/plugins";
+import { mainnet, sepolia, anvil } from "viem/chains";
+import { dnftAbi } from "@/lib/abi/Dnft";
+import { licenserAbi } from "@/lib/abi/Licenser";
+import { dyadAbi } from "@/lib/abi/Dyad";
+import { vaultManagerAbi } from "@/lib/abi/VaultManager";
+import { vaultAbi } from "@/lib/abi/Vault";
+import { paymentsAbi } from "@/lib/abi/Payments";
+import { merkleClaimAbi } from "@/lib/abi/MerkleClaim";
+import { erc20Abi } from "viem";
 
 export default defineConfig({
   out: "generated.ts",
@@ -19,7 +19,7 @@ export default defineConfig({
         [mainnet.id]: "0xA7573209bD3c3b1a3590Fd44F33ED9fE721ae4C2",
         [anvil.id]: "0xA7573209bD3c3b1a3590Fd44F33ED9fE721ae4C2",
       },
-      abi: merkleClaimAbi
+      abi: merkleClaimAbi,
     },
     {
       name: "DNft",
@@ -94,6 +94,14 @@ export default defineConfig({
       abi: vaultAbi,
     },
     {
+      name: "tBTCVault",
+      address: {
+        [mainnet.id]: "0x3D72f7Fc3A9537e1fcC6FBF91AF55CcF2c5C4ed0",
+        [anvil.id]: "0x3D72f7Fc3A9537e1fcC6FBF91AF55CcF2c5C4ed0",
+      },
+      abi: vaultAbi,
+    },
+    {
       name: "Payments",
       address: {
         // [sepolia.id]: "0xe9F9Df2De303802f81EB114a5F24a3d4A17089f4",
@@ -160,6 +168,14 @@ export default defineConfig({
       address: {
         [mainnet.id]: "0xf3768D6e78E65FC64b8F12ffc824452130BD5394",
         [anvil.id]: "0xf3768D6e78E65FC64b8F12ffc824452130BD5394",
+      },
+      abi: erc20Abi,
+    },
+    {
+      name: "tBTC",
+      address: {
+        [mainnet.id]: "0x18084fbA666a33d37592fA2633fD49a74DD93a88",
+        [anvil.id]: "0x18084fbA666a33d37592fA2633fD49a74DD93a88",
       },
       abi: erc20Abi,
     },
