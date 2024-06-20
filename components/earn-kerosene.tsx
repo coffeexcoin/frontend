@@ -74,7 +74,7 @@ export function EarnKeroseneContent() {
     if (!!address && claimTransaction?.status === "success") {
       refetch(address);
     }
-  });
+  }, [address, claimTransaction, refetch]);
 
   return (
     <div>
