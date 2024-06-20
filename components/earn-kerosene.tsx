@@ -1,83 +1,11 @@
-import { useAccount } from "wagmi";
-import { formatEther, parseEther } from "viem";
-import { Button } from "@/components/ui/button";
-import {
-  dNftAbi,
-  dNftAddress,
-  useReadDNftPriceIncrease,
-  useReadDNftPublicMints,
-  useReadDNftStartPrice,
-  useReadDNftTotalSupply,
-} from "@/generated";
-import { defaultChain } from "@/lib/config";
-import { useTransactionStore } from "@/lib/store";
 import ButtonComponent from "@/components/reusable/ButtonComponent";
-import KeroseneCard from "@/components/KeroseneCard/KeroseneCard";
-import KeroseneCardMerkle from "@/components/KeroseneCard/KeroseneCardMerkle";
-import StakingAbi from "@/abis/Staking.json";
-import useKerosenePrice from "@/hooks/useKerosenePrice";
 import NoteCardsContainer from "../components/reusable/NoteCardsContainer";
 import { ClaimModalContent } from "./claim-modal-content";
-import { useEffect, useState } from "react";
-
-type MerklData = {
-  apr: number;
-  tvl: number;
-};
+import { useMerklCampaign } from "@/hooks/useMerklCampaign";
 
 export function EarnKeroseneContent() {
-  const [merklData, setMerkleData] = useState<MerklData | undefined>(undefined);
-  const { address, isConnected } = useAccount();
-  const { setTransactionData } = useTransactionStore();
-  console.log("staking", StakingAbi.abi);
 
-  const { data: startingPrice } = useReadDNftStartPrice({
-    chainId: defaultChain.id,
-  });
-  console.log("READING", startingPrice);
-  const { data: publicMints } = useReadDNftPublicMints({
-    chainId: defaultChain.id,
-  });
-  const { data: priceIncrease } = useReadDNftPriceIncrease({
-    chainId: defaultChain.id,
-  });
-  const { data: totalSupply } = useReadDNftTotalSupply({
-    chainId: defaultChain.id,
-  });
-
-  const mintPrice = formatEther(
-    (startingPrice || 0n) + (priceIncrease || 0n) * (publicMints || 0n)
-  );
-
-  const nextNote = parseInt(totalSupply?.toString() || "0", 10);
-
-  const { kerosenePrice } = useKerosenePrice();
-
-  const keroseneCardsData = [
-    {
-      currency: "ETH - DYAD (Uniswap)",
-      APY: "24",
-      staked: "390",
-      keroseneEarned: "830",
-    },
-  ];
-
-  useEffect(() => {
-    async function getMerkl() {
-
-      const res = await fetch("https://api.merkl.xyz/v3/campaigns?chainIds=1");
-      const data = await res.json();
-      const campaigns = data["1"]["2_0x8B238f615c1f312D22A65762bCf601a37f1EeEC7"];
-      for (const campaign of Object.values(campaigns) as any[]) {
-        if (campaign.isLive) {
-          setMerkleData(campaign);
-          break;
-        }
-      }
-    }
-    getMerkl();
-  }, [])
-
+  const { currentCampaign: merklData } = useMerklCampaign();
 
   return (
     <div>
