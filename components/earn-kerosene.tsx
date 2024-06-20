@@ -64,16 +64,20 @@ export function EarnKeroseneContent() {
 
   useEffect(() => {
     async function getMerkl() {
+
       const res = await fetch("https://api.merkl.xyz/v3/campaigns?chainIds=1");
       const data = await res.json();
-      const campaign =
-        data["1"]["2_0x8B238f615c1f312D22A65762bCf601a37f1EeEC7"][
-          "0x3a0c7f275e6af9d9705ca0bc9a84a2c28ba0421acab059deb9d77e156995bb96"
-        ];
-      setMerkleData(campaign);
+      const campaigns = data["1"]["2_0x8B238f615c1f312D22A65762bCf601a37f1EeEC7"];
+      for (const campaign of Object.values(campaigns) as any[]) {
+        if (campaign.isLive) {
+          setMerkleData(campaign);
+          break;
+        }
+      }
     }
     getMerkl();
-  }, []);
+  }, [])
+
 
   return (
     <div>
