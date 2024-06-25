@@ -1,21 +1,23 @@
 import ButtonComponent from "@/components/reusable/ButtonComponent";
 import {
   keroseneDnftClaimAddress,
-  useReadKerosene,
+  useReadDNftBalanceOf,
   useReadKeroseneAllowance,
   useReadKeroseneBalanceOf,
   useReadKeroseneDnftClaimPrice,
   useReadKeroseneDnftClaimPurchased,
   useReadMerkleClaimErc20HasClaimed,
+  useSimulateKeroseneApprove,
   useSimulateKeroseneDnftClaimBuyNote,
   useSimulateMerkleClaimErc20Claim,
+  useWriteKeroseneApprove,
   useWriteKeroseneDnftClaimBuyNote,
   useWriteMerkleClaimErc20Claim,
 } from "@/generated";
 import { defaultChain } from "@/lib/config";
 import claimData from "@/lib/snapshot-data.json";
 import MerkleTree from "merkletreejs";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   encodePacked,
   formatEther,
@@ -23,7 +25,7 @@ import {
   keccak256,
   parseEther,
 } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 
 export const SnapshotClaim = () => {
   const getClaimLeaf = (address: string, amount: bigint) =>
@@ -65,7 +67,7 @@ export const SnapshotClaim = () => {
     return parseEther(data?.amount || "0");
   }, [address]);
 
-  const { data: hasClaimed } = useReadMerkleClaimErc20HasClaimed({
+  const { data: hasClaimed, refetch: reloadHasClaimed } = useReadMerkleClaimErc20HasClaimed({
     args: [address!],
     chainId: defaultChain.id,
     query: {
@@ -77,21 +79,28 @@ export const SnapshotClaim = () => {
     chainId: defaultChain.id,
   });
 
-  const { data: purchasedNote } = useReadKeroseneDnftClaimPurchased({
-    args: [address!],
-    chainId: defaultChain.id,
-    query: {
-      enabled: !!address,
-    },
+  const { data: remainingPurchases } = useReadDNftBalanceOf({
+    args: [keroseneDnftClaimAddress[defaultChain.id]],
   });
 
-  const { data: keroseneBalance } = useReadKeroseneBalanceOf({
-    chainId: defaultChain.id,
-    args: [address!],
-    query: {
-      enabled: !!address,
-    },
-  });
+  const { data: purchasedNote, refetch: reloadPurchaseStatus } =
+    useReadKeroseneDnftClaimPurchased({
+      args: [address!],
+      chainId: defaultChain.id,
+      query: {
+        enabled: !!address,
+      },
+    });
+
+  const { data: keroseneBalance, refetch: reloadKeroseneBalance } =
+    useReadKeroseneBalanceOf({
+      chainId: defaultChain.id,
+      args: [address!],
+      query: {
+        enabled: !!address,
+        refetchInterval: 10000,
+      },
+    });
 
   const { data: keroseneAllowance, refetch: reloadAllowance } =
     useReadKeroseneAllowance({
@@ -101,6 +110,19 @@ export const SnapshotClaim = () => {
         enabled: !!address,
       },
     });
+
+  const { data: keroseneApprovalConfig, error: keroseneApprovalError } =
+    useSimulateKeroseneApprove({
+      args: [keroseneDnftClaimAddress[defaultChain.id], buyNotePrice || 0n],
+      query: {
+        enabled: !!address && (keroseneAllowance || 0n) < buyNotePrice!,
+      },
+    });
+
+  const {
+    writeContract: approveKerosene,
+    data: approveKeroseneTransactionHash,
+  } = useWriteKeroseneApprove();
 
   const buyProof = useMemo(() => {
     if (!address) return [];
@@ -117,7 +139,7 @@ export const SnapshotClaim = () => {
     args: [buyProof],
   });
 
-  const { writeContract: buyNoteWithKerosene } =
+  const { writeContract: buyNoteWithKerosene, data: buyNoteTransactionHash } =
     useWriteKeroseneDnftClaimBuyNote();
 
   const claimProof = useMemo(() => {
@@ -128,22 +150,57 @@ export const SnapshotClaim = () => {
       .map((p) => p as `0x${string}`);
   }, [address, claimAmount, claimTree]);
 
-  const { data: merkleClaimConfig, error } = useSimulateMerkleClaimErc20Claim({
-    query: {
-      enabled: !!address && !hasClaimed,
-    },
-    args: [address!, claimAmount, claimProof],
+  const { data: merkleClaimConfig, error }: { data: any; error: any } =
+    useSimulateMerkleClaimErc20Claim({
+      query: {
+        enabled: !!address && !hasClaimed,
+      },
+      args: [address!, claimAmount, claimProof],
+    });
+
+  const { writeContract, data: claimKeroseneTransactionHash } =
+    useWriteMerkleClaimErc20Claim();
+
+  const { data: keroseneClaimReceipt } = useWaitForTransactionReceipt({
+    hash: claimKeroseneTransactionHash,
   });
 
-  const { writeContract } = useWriteMerkleClaimErc20Claim();
+  const { data: keroseneApprovalReceipt } = useWaitForTransactionReceipt({
+    hash: approveKeroseneTransactionHash,
+  });
+
+  const { data: buyNoteTransactionReceipt } = useWaitForTransactionReceipt({
+    hash: buyNoteTransactionHash,
+  });
+
+  useEffect(() => {
+    if (keroseneClaimReceipt?.status === "success") {
+      reloadKeroseneBalance();
+      reloadHasClaimed();
+    }
+  }, [keroseneClaimReceipt, reloadKeroseneBalance, reloadHasClaimed]);
+
+  useEffect(() => {
+    if (keroseneApprovalReceipt?.status === "success") {
+      reloadAllowance();
+    }
+  }, [keroseneApprovalReceipt, reloadAllowance]);
+
+  useEffect(() => {
+    if (buyNoteTransactionReceipt?.status === "success") {
+      reloadPurchaseStatus();
+    }
+  }, [buyNoteTransactionReceipt, reloadPurchaseStatus]);
 
   return (
     <div>
       <div className="flex flex-col bg-[#1A1A1A] gap-4 p-7 rounded-[10px] mt-5">
         {!address && <p>Connect your wallet to claim KEROSENE</p>}
-        {!hasClaimed && error && (
-          <p className="text-red-500">{error.message}</p>
-        )}
+        {!hasClaimed &&
+          error &&
+          error.cause?.data?.errorName !== "NotInMerkle" && (
+            <p className="text-red-500">{error.message}</p>
+          )}
 
         {hasClaimed ? (
           <p className="text-green-500">
@@ -164,20 +221,56 @@ export const SnapshotClaim = () => {
           <p>Not eligible for any KEROSENE</p>
         )}
       </div>
-      <div className="flex flex-col bg-[#1A1A1A] gap-4 p-7 rounded-[10px] mt-5">
-        <p className="text-[#A1A1AA]">Buy Note with Kerosene</p>
-        {keroseneBalance !== undefined &&
-          buyNotePrice !== undefined &&
-          (purchasedNote === true ? (
-            <p>Purchased note with kerosene</p>
-          ) : keroseneBalance > buyNotePrice ? (
-            <ButtonComponent>
-              Buy note for {formatEther(buyNotePrice || 0n)} KEROSENE
-            </ButtonComponent>
-          ) : (
-            <p>Eligible to buy a note for {formatEther(buyNotePrice || 0n)}.</p>
-          ))}
-      </div>
+      {remainingPurchases !== undefined && remainingPurchases !== 0n && (
+        <div className="flex flex-col bg-[#1A1A1A] gap-4 p-7 rounded-[10px] mt-5">
+          <p className="text-[#A1A1AA]">
+            Buy Note with Kerosene{" "}
+            <b>({remainingPurchases?.toString() || "0"} left)</b>
+          </p>
+          {keroseneBalance !== undefined &&
+            buyNotePrice !== undefined &&
+            (purchasedNote === true ? (
+              <p>Purchased note with kerosene</p>
+            ) : keroseneBalance >= buyNotePrice ? (
+              (keroseneAllowance || 0n) >= buyNotePrice ? (
+                <ButtonComponent
+                  onClick={() => {
+                    buyNoteWithKerosene(buyNoteConfig!.request);
+                  }}
+                >
+                  Buy note for {formatEther(buyNotePrice || 0n)} KEROSENE
+                </ButtonComponent>
+              ) : (
+                <ButtonComponent
+                  onClick={() => {
+                    approveKerosene(keroseneApprovalConfig!.request);
+                  }}
+                >
+                  Approve {formatEther(buyNotePrice || 0n)} KEROSENE
+                </ButtonComponent>
+              )
+            ) : (
+              <>
+                <p>
+                  Eligible to buy a note for {formatEther(buyNotePrice || 0n)}{" "}
+                  KEROSENE. Current balance is {formatEther(keroseneBalance)}{" "}
+                  KEROSENE. Please acquire{" "}
+                  {formatEther(buyNotePrice - keroseneBalance)} additional
+                  KEROSENE.
+                </p>
+                <ButtonComponent
+                  onClick={() =>
+                    window.open(
+                      `https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0xf3768D6e78E65FC64b8F12ffc824452130BD5394&exactField=output&exactAmount=${formatEther(buyNotePrice - keroseneBalance)}`
+                    )
+                  }
+                >
+                  Buy on Uniswap
+                </ButtonComponent>
+              </>
+            ))}
+        </div>
+      )}
     </div>
   );
 };

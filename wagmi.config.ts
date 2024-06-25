@@ -18,7 +18,7 @@ export default defineConfig({
     {
       name: "KeroseneDnftClaim",
       address: {
-        [mainnet.id]: zeroAddress
+        [mainnet.id]: "0xa15Abaec47F56afC05027AD839c46703AC3a8DC9"
       },
       abi: keroseneDnftClaimAbi,
     },
