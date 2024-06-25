@@ -10,10 +10,18 @@ import { paymentsAbi } from "@/lib/abi/Payments";
 import { merkleClaimAbi } from "@/lib/abi/MerkleClaim";
 import { erc20Abi } from "viem";
 import { angleDistributorAbi } from "./lib/abi/AngleDistributor";
+import { keroseneDnftClaimAbi } from "./lib/abi/KeroseneDnftClaim";
 
 export default defineConfig({
   out: "generated.ts",
   contracts: [
+    {
+      name: "KeroseneDnftClaim",
+      address: {
+        [mainnet.id]: "0xa15Abaec47F56afC05027AD839c46703AC3a8DC9"
+      },
+      abi: keroseneDnftClaimAbi,
+    },
     {
       name: "Distributor",
       address: {
