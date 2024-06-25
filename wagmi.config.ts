@@ -8,7 +8,7 @@ import { vaultManagerAbi } from "@/lib/abi/VaultManager";
 import { vaultAbi } from "@/lib/abi/Vault";
 import { paymentsAbi } from "@/lib/abi/Payments";
 import { merkleClaimAbi } from "@/lib/abi/MerkleClaim";
-import { erc20Abi, zeroAddress } from "viem";
+import { erc20Abi } from "viem";
 import { angleDistributorAbi } from "./lib/abi/AngleDistributor";
 import { keroseneDnftClaimAbi } from "./lib/abi/KeroseneDnftClaim";
 
