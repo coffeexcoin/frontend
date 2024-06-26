@@ -19,6 +19,7 @@ import claimData from "@/lib/snapshot-data.json";
 import MerkleTree from "merkletreejs";
 import { useEffect, useMemo } from "react";
 import {
+  encodeAbiParameters,
   encodePacked,
   formatEther,
   getAddress,
@@ -46,9 +47,8 @@ export const SnapshotClaim = () => {
   }, []);
 
   const getBuyLeaf = (address: string) =>
-    Buffer.from(
-      keccak256(encodePacked(["address"], [getAddress(address)])),
-      "hex"
+    keccak256(
+      encodeAbiParameters([{ type: "address" }], [getAddress(address)])
     );
 
   const buyNoteTree = useMemo(() => {
@@ -67,13 +67,14 @@ export const SnapshotClaim = () => {
     return parseEther(data?.amount || "0");
   }, [address]);
 
-  const { data: hasClaimed, refetch: reloadHasClaimed } = useReadMerkleClaimErc20HasClaimed({
-    args: [address!],
-    chainId: defaultChain.id,
-    query: {
-      enabled: !!address,
-    },
-  });
+  const { data: hasClaimed, refetch: reloadHasClaimed } =
+    useReadMerkleClaimErc20HasClaimed({
+      args: [address!],
+      chainId: defaultChain.id,
+      query: {
+        enabled: !!address,
+      },
+    });
 
   const { data: buyNotePrice } = useReadKeroseneDnftClaimPrice({
     chainId: defaultChain.id,
@@ -132,12 +133,13 @@ export const SnapshotClaim = () => {
       .map((p) => p as `0x${string}`);
   }, [address, buyNoteTree]);
 
-  const { data: buyNoteConfig } = useSimulateKeroseneDnftClaimBuyNote({
-    query: {
-      enabled: !!address && purchasedNote === false,
-    },
-    args: [buyProof],
-  });
+  const { data: buyNoteConfig, error: buyNoteError } =
+    useSimulateKeroseneDnftClaimBuyNote({
+      query: {
+        enabled: !!address && purchasedNote === false,
+      },
+      args: [buyProof],
+    });
 
   const { writeContract: buyNoteWithKerosene, data: buyNoteTransactionHash } =
     useWriteKeroseneDnftClaimBuyNote();
@@ -234,6 +236,7 @@ export const SnapshotClaim = () => {
             ) : keroseneBalance >= buyNotePrice ? (
               (keroseneAllowance || 0n) >= buyNotePrice ? (
                 <ButtonComponent
+                  disabled={buyNoteConfig === undefined || !!buyNoteError}
                   onClick={() => {
                     buyNoteWithKerosene(buyNoteConfig!.request);
                   }}
